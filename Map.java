@@ -13,7 +13,7 @@ public class Map extends JPanel {
     String[] mapPath = {"assets/map1.png"};
     BufferedImage mapImage;
     ArrayList<Rectangle> murs = new ArrayList<>();
-    boolean devMode = false; // Option de développement, à désactiver en prod
+    boolean devMode = true; // Option de développement, à désactiver en prod
 
     // create and init map
     public Map() {
@@ -36,7 +36,11 @@ public class Map extends JPanel {
         // mur bas gauche
         murs.add(new Rectangle(0,390,150,90));
         // mur bas milieu
-        murs.add(new Rectangle(290,390,140,90));
+        murs.add(new Rectangle(290,390,91,90));
+        murs.add(new Rectangle(380,390,48,70));
+        murs.add(new Rectangle(367,480,14,this.height));
+
+        
 
         setFocusable(true);
         requestFocusInWindow();
