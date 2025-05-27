@@ -36,9 +36,9 @@ public class Map extends JPanel {
         // mur bas gauche
         murs.add(new Rectangle(0,390,150,90));
         // mur bas milieu
-        murs.add(new Rectangle(290,390,91,90));
+        murs.add(new Rectangle(290,390,90,90));
         murs.add(new Rectangle(380,390,48,70));
-        murs.add(new Rectangle(367,480,14,this.height));
+        murs.add(new Rectangle(370,480,10,this.height));
 
         
 
@@ -111,7 +111,7 @@ public class Map extends JPanel {
         }
         // Dessiner les murs pour debug (en couleur vive)
         if (devMode ) {
-        g.setColor(Color.MAGENTA);
+        g.setColor(new Color(255,255,255,50));
         } else {
             g.setColor(new Color(0, 0, 0, 0)); // Transparent color
         }
