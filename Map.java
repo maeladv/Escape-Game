@@ -25,7 +25,13 @@ public class Map extends JPanel {
         }
         this.setPreferredSize(new Dimension(width, height));
         joueur = new Joueur("Joueur", width/2-20, height/2-20, 10);
-        // Exemple de murs (à modifier par l'utilisateur)
+        // Murs
+        // bords de la map
+        murs.add(new Rectangle (-20,0,20,this.height));
+        murs.add(new Rectangle (0, -20,this.width, 20));
+        murs.add(new Rectangle (this.width,0,20,this.height));
+        murs.add(new Rectangle(0,this.height,this.width,20));
+
         murs.add(new Rectangle(100, 100, 200, 40));
         murs.add(new Rectangle(300, 200, 40, 200));
         setFocusable(true);
@@ -94,5 +100,15 @@ public class Map extends JPanel {
         if (joueur != null) {
             joueur.afficher(g);
         }
+    }
+
+
+
+    // getteurs 
+    public int getWidth() {
+        return width;
+    }
+    public int getHeight() {
+        return height;
     }
 }
