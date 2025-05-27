@@ -34,10 +34,10 @@ public class Map extends JPanel {
         murs.add(new Rectangle(0,this.height,this.width,20));
 
         // mur bas gauche
-        murs.add(new Rectangle(0,390,150,90));
+        murs.add(new Rectangle(0,390,150,110));
         // mur bas milieu
-        murs.add(new Rectangle(290,390,90,90));
-        murs.add(new Rectangle(380,390,48,70));
+        murs.add(new Rectangle(290,390,90,110));
+        murs.add(new Rectangle(380,390,48,90));
         murs.add(new Rectangle(370,480,10,this.height));
 
         
@@ -64,7 +64,7 @@ public class Map extends JPanel {
                         nextY += joueur.speed;
                         break;
                 }
-                Rectangle nextPos = new Rectangle(nextX, nextY, taille, taille);
+                Rectangle nextPos = new Rectangle(nextX, nextY + ((2 * taille) / 3), taille, (taille / 3));
                 boolean collision = false;
                 for (Rectangle mur : murs) {
                     if (nextPos.intersects(mur)) {
