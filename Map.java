@@ -13,6 +13,7 @@ public class Map extends JPanel {
     String[] mapPath = {"assets/map1.png"};
     BufferedImage mapImage;
     ArrayList<Rectangle> murs = new ArrayList<>();
+    boolean devMode = true; // Option de développement, à désactiver en prod
 
     // create and init map
     public Map() {
@@ -31,6 +32,11 @@ public class Map extends JPanel {
         murs.add(new Rectangle (0, -20,this.width, 20));
         murs.add(new Rectangle (this.width,0,20,this.height));
         murs.add(new Rectangle(0,this.height,this.width,20));
+
+        // mur bas gauche
+        murs.add(new Rectangle(0,390,150,90));
+        // mur bas milieu
+        murs.add(new Rectangle(290,390,140,90));
 
         murs.add(new Rectangle(100, 100, 200, 40));
         murs.add(new Rectangle(300, 200, 40, 200));
@@ -83,6 +89,15 @@ public class Map extends JPanel {
                 repaint();
             }
         });
+        // Option dev : afficher la position du clic souris
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (devMode) {
+                    System.out.println("Clic à la position : x=" + e.getX() + ", y=" + e.getY());
+                }
+            }
+        });
     }
 
     // Mettre à jour la position du joueur
@@ -93,7 +108,9 @@ public class Map extends JPanel {
             g.drawImage(mapImage, 0, 0, width, height, null);
         }
         // Dessiner les murs pour debug (en couleur vive)
+        if (devMode ) {
         g.setColor(Color.MAGENTA);
+        }
         for (Rectangle mur : murs) {
             g.fillRect(mur.x, mur.y, mur.width, mur.height);
         }
