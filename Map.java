@@ -13,7 +13,7 @@ public class Map extends JPanel {
     String[] mapPath = {"assets/map1.png"};
     BufferedImage mapImage;
     ArrayList<Rectangle> murs = new ArrayList<>();
-    boolean devMode = true; // Option de développement, à désactiver en prod
+    boolean devMode = false; // Option de développement, à désactiver en prod
 
     // create and init map
     public Map() {
@@ -38,8 +38,6 @@ public class Map extends JPanel {
         // mur bas milieu
         murs.add(new Rectangle(290,390,140,90));
 
-        murs.add(new Rectangle(100, 100, 200, 40));
-        murs.add(new Rectangle(300, 200, 40, 200));
         setFocusable(true);
         requestFocusInWindow();
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -110,6 +108,8 @@ public class Map extends JPanel {
         // Dessiner les murs pour debug (en couleur vive)
         if (devMode ) {
         g.setColor(Color.MAGENTA);
+        } else {
+            g.setColor(new Color(0, 0, 0, 0)); // Transparent color
         }
         for (Rectangle mur : murs) {
             g.fillRect(mur.x, mur.y, mur.width, mur.height);
