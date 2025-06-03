@@ -48,6 +48,22 @@ public class Map extends JPanel {
         // Initialisation des couches
         Layer backgroundLayer = new Layer();
         Layer playerLayer = new Layer();
+        Layer topLayer = new Layer();
+        BufferedImage map2Image = null;
+        try {
+            map2Image = ImageIO.read(new File("assets/map2.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        final BufferedImage finalMap2Image = map2Image;
+        topLayer.addElement(new Drawable() {
+            @Override
+            public void draw(Graphics g) {
+                if (finalMap2Image != null) {
+                    g.drawImage(finalMap2Image, 0, 0, width, height, null);
+                }
+            }
+        });
 
         // Ajouter la map au layer de fond
         backgroundLayer.addElement(new Drawable() {
@@ -60,10 +76,17 @@ public class Map extends JPanel {
         });
 
         // Ajouter le joueur au layer joueur
-        playerLayer.addElement(joueur);
+        playerLayer.addElement(new Drawable() {
+            @Override
+            public void draw(Graphics g) {
+                joueur.afficher(g);
+            }
+        });
 
+        // Ordre : fond, joueur, topLayer (toujours au-dessus)
         layers.add(backgroundLayer);
         layers.add(playerLayer);
+        layers.add(topLayer);
 
         setFocusable(true);
         requestFocusInWindow();
@@ -134,16 +157,14 @@ public class Map extends JPanel {
         }
         // Dessiner les murs pour debug (en couleur vive)
         if (devMode ) {
-        g.setColor(new Color(255,255,255,50));
+            g.setColor(new Color(255,255,255,50));
         } else {
             g.setColor(new Color(0, 0, 0, 0)); // Transparent color
         }
         for (Rectangle mur : murs) {
             g.fillRect(mur.x, mur.y, mur.width, mur.height);
         }
-        if (joueur != null) {
-            joueur.afficher(g);
-        }
+        // SUPPRIME : dessin du joueur hors layers
     }
 
 
