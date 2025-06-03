@@ -5,6 +5,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Map extends JPanel {
     int width;
@@ -14,6 +15,8 @@ public class Map extends JPanel {
     BufferedImage mapImage;
     ArrayList<Rectangle> murs = new ArrayList<>();
     boolean devMode = true; // Option de développement, à désactiver en prod
+
+    private List<Layer> layers;
 
     // create and init map
     public Map() {
@@ -40,7 +43,50 @@ public class Map extends JPanel {
         murs.add(new Rectangle(380,390,48,90));
         murs.add(new Rectangle(370,480,10,this.height));
 
-        
+        layers = new ArrayList<>();
+
+        // Initialisation des couches
+        Layer backgroundLayer = new Layer();
+        Layer playerLayer = new Layer();
+        Layer topLayer = new Layer();
+        BufferedImage map2Image = null;
+        try {
+            map2Image = ImageIO.read(new File("assets/map2.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        final BufferedImage finalMap2Image = map2Image;
+        topLayer.addElement(new Drawable() {
+            @Override
+            public void draw(Graphics g) {
+                if (finalMap2Image != null) {
+                    g.drawImage(finalMap2Image, 0, 0, width, height, null);
+                }
+            }
+        });
+
+        // Ajouter la map au layer de fond
+        backgroundLayer.addElement(new Drawable() {
+            @Override
+            public void draw(Graphics g) {
+                if (mapImage != null) {
+                    g.drawImage(mapImage, 0, 0, width, height, null);
+                }
+            }
+        });
+
+        // Ajouter le joueur au layer joueur
+        playerLayer.addElement(new Drawable() {
+            @Override
+            public void draw(Graphics g) {
+                joueur.afficher(g);
+            }
+        });
+
+        // Ordre : fond, joueur, topLayer (toujours au-dessus)
+        layers.add(backgroundLayer);
+        layers.add(playerLayer);
+        layers.add(topLayer);
 
         setFocusable(true);
         requestFocusInWindow();
@@ -106,21 +152,19 @@ public class Map extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (mapImage != null) {
-            g.drawImage(mapImage, 0, 0, width, height, null);
+        for (Layer layer : layers) {
+            layer.draw(g);
         }
         // Dessiner les murs pour debug (en couleur vive)
         if (devMode ) {
-        g.setColor(new Color(255,255,255,50));
+            g.setColor(new Color(255,255,255,50));
         } else {
             g.setColor(new Color(0, 0, 0, 0)); // Transparent color
         }
         for (Rectangle mur : murs) {
             g.fillRect(mur.x, mur.y, mur.width, mur.height);
         }
-        if (joueur != null) {
-            joueur.afficher(g);
-        }
+        // SUPPRIME : dessin du joueur hors layers
     }
 
 
