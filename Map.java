@@ -99,15 +99,19 @@ public class Map extends JPanel {
                 switch (e.getKeyCode()) {
                     case java.awt.event.KeyEvent.VK_LEFT:
                         nextX -= joueur.speed;
+                        joueur.state = 0; // Mettre à jour l'état du joueur pour la direction gauche
                         break;
                     case java.awt.event.KeyEvent.VK_RIGHT:
                         nextX += joueur.speed;
+                        joueur.state = 1; // Mettre à jour l'état du joueur pour la direction droite
                         break;
                     case java.awt.event.KeyEvent.VK_UP:
                         nextY -= joueur.speed;
+                        joueur.state = 2; // Mettre à jour l'état du joueur pour la direction haut
                         break;
                     case java.awt.event.KeyEvent.VK_DOWN:
                         nextY += joueur.speed;
+                        joueur.state = 3; // Mettre à jour l'état du joueur pour la direction bas
                         break;
                 }
                 Rectangle nextPos = new Rectangle(nextX, nextY + ((2 * taille) / 3), taille, (taille / 3));
