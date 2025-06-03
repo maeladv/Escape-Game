@@ -5,6 +5,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Map extends JPanel {
     int width;
@@ -14,6 +15,8 @@ public class Map extends JPanel {
     BufferedImage mapImage;
     ArrayList<Rectangle> murs = new ArrayList<>();
     boolean devMode = true; // Option de développement, à désactiver en prod
+
+    private List<Layer> layers;
 
     // create and init map
     public Map() {
@@ -40,7 +43,27 @@ public class Map extends JPanel {
         murs.add(new Rectangle(380,390,48,90));
         murs.add(new Rectangle(370,480,10,this.height));
 
-        
+        layers = new ArrayList<>();
+
+        // Initialisation des couches
+        Layer backgroundLayer = new Layer();
+        Layer playerLayer = new Layer();
+
+        // Ajouter la map au layer de fond
+        backgroundLayer.addElement(new Drawable() {
+            @Override
+            public void draw(Graphics g) {
+                if (mapImage != null) {
+                    g.drawImage(mapImage, 0, 0, width, height, null);
+                }
+            }
+        });
+
+        // Ajouter le joueur au layer joueur
+        playerLayer.addElement(joueur);
+
+        layers.add(backgroundLayer);
+        layers.add(playerLayer);
 
         setFocusable(true);
         requestFocusInWindow();
@@ -106,8 +129,8 @@ public class Map extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (mapImage != null) {
-            g.drawImage(mapImage, 0, 0, width, height, null);
+        for (Layer layer : layers) {
+            layer.draw(g);
         }
         // Dessiner les murs pour debug (en couleur vive)
         if (devMode ) {
