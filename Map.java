@@ -47,10 +47,16 @@ public class Map extends JPanel {
         murs.add(new Rectangle(525,275,10,this.height));
         
         // mur bas droite
-        murs.add(new Rectangle(540,420,40,50));
+        murs.add(new Rectangle(540,430,40,50));
         murs.add(new Rectangle(690,440,90,50));
 
         //mur millieu droite
+
+        // mur millieu gauche
+        murs.add(new Rectangle(75,260,105,50));
+        murs.add(new Rectangle(75,285,10,50));
+
+        
 
 
         layers = new ArrayList<>();
