@@ -33,15 +33,25 @@ public class Map extends JPanel {
         // bords de la map
         murs.add(new Rectangle (-20,0,20,this.height));
         murs.add(new Rectangle (0, -20,this.width, 20));
-        murs.add(new Rectangle (this.width,0,20,this.height));
+        murs.add(new Rectangle(785,0,10,this.height));
         murs.add(new Rectangle(0,this.height,this.width,20));
 
         // mur bas gauche
-        murs.add(new Rectangle(0,390,150,110));
+        murs.add(new Rectangle(0,450,150,50));
         // mur bas milieu
-        murs.add(new Rectangle(290,390,90,110));
-        murs.add(new Rectangle(380,390,48,90));
-        murs.add(new Rectangle(370,480,10,this.height));
+        murs.add(new Rectangle(290,450,90,50));
+        murs.add(new Rectangle(380,450,48,50));
+
+        //mur vertical
+        murs.add(new Rectangle(370,80,10,this.height));
+        murs.add(new Rectangle(525,275,10,this.height));
+        
+        // mur bas droite
+        murs.add(new Rectangle(540,420,40,50));
+        murs.add(new Rectangle(690,440,90,50));
+
+        //mur millieu droite
+
 
         layers = new ArrayList<>();
 
@@ -141,11 +151,21 @@ public class Map extends JPanel {
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                if (devMode) {
+                if (devMode && e.getButton() == java.awt.event.MouseEvent.BUTTON3) { // Clic droit
+                    deplacerJoueurVersSouris(e.getX(), e.getY());
+                } else if (devMode) { // Clic gauche ou autre
                     System.out.println("Clic à la position : x=" + e.getX() + ", y=" + e.getY());
                 }
             }
         });
+    }
+
+    // Méthode pour déplacer le joueur aux coordonnées de la souris
+    private void deplacerJoueurVersSouris(int mouseX, int mouseY) {
+        if (devMode) {
+            joueur.setPosition(mouseX - 20, mouseY - 20); // Centrer le joueur sur le clic
+            repaint();
+        }
     }
 
     // Mettre à jour la position du joueur

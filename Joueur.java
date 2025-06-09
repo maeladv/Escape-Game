@@ -49,4 +49,9 @@ public class Joueur {
     public void deplacerDroite() { x += speed; state = 1; }
     public void deplacerHaut() { y -= speed; state = 2; }
     public void deplacerBas() { y += speed; state = 3; }
+
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 }
