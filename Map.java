@@ -51,11 +51,13 @@ public class Map extends JPanel {
         murs.add(new Rectangle(690,440,90,50));
 
         //mur millieu droite
+        murs.add(new Rectangle(660,270,150,50));
 
         // mur millieu
+        murs.add(new Rectangle(250,265,340,50));
 
         // mur millieu gauche
-        murs.add(new Rectangle(75,260,105,50));
+        murs.add(new Rectangle(75,265,105,50));
         murs.add(new Rectangle(75,285,10,50));
 
         // mur haut gauche
