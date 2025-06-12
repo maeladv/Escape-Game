@@ -27,8 +27,7 @@ public class Map extends JPanel {
     private List<Layer> layers;
 
     // Système d'objets interactifs
-    private List<List<Objet>> objetsParMap = new ArrayList<>();
-    private ArrayList<Objet> objets = new ArrayList<>();
+    private List<List<Objet>> objetsParMap = new ArrayList<>(); // Liste de listes d'objets, un ensemble d'objets par map
 
     // Création et initialisation de la map
     public Map() {
@@ -76,7 +75,6 @@ public class Map extends JPanel {
                 setDisplayedMap(1);
                 // Met à jour les murs et objets pour la nouvelle map
                 murs = new ArrayList<>(mursParMap.get(displayedMap));
-                objets = new ArrayList<>(objetsParMap.get(displayedMap));
                 printDev("Interaction avec la porte de la map 0 ! Changement de map.");
                 repaint();
             }
@@ -133,6 +131,21 @@ public class Map extends JPanel {
             new Rectangle(600, 510, 50, 20),
             () -> afficherDialogue("Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.")
         ));
+        // Première Bibliothèque
+        objetsBibliotheque.add(new Objet(
+            new Rectangle(70, 480, 50, 20),
+            () -> {
+                String[] messages = {
+                    "Ah! Il semblerait que l'on puisse interagir avec ces bibliothèques.",
+                    "Ce vieux bâtiment est donc une bibliothèque.",
+                    "Elle me semble très ancienne et poussiéreuse. Certains murs tombent mêm en ruines !",
+                    "On dirait qu'elle n'a pas été utilisée depuis des années.",
+                    "Peut-être que quelqu'un a laissé un message ici ?",
+                    "Il y a des livres sur les étagères, mais certains sont trop poussiéreux pour être lus."
+                };
+                afficherScript(messages, "Suivant");
+        }
+        ));
         objetsParMap.add(objetsBibliotheque);
 
 
@@ -140,7 +153,6 @@ public class Map extends JPanel {
         // On initialise la liste de murs courante
         murs = new ArrayList<>(mursParMap.get(displayedMap));
         // On initialise la liste d'objets courante
-        objets = new ArrayList<>(objetsParMap.get(displayedMap));
 
         layers = new ArrayList<>();
 
@@ -247,7 +259,7 @@ public class Map extends JPanel {
                 // On ajoute seulement 10 pixels de marge au lieu de 20
                 Rectangle zoneInteraction = new Rectangle(joueur.x - 5, joueur.y - 5, taille + 10, taille + 10);
                 
-                for (Objet obj : objets) {
+                for (Objet obj : objetsParMap.get(displayedMap)) {
                     // Vérifier si le joueur est proche de l'objet
                     if (zoneInteraction.intersects(obj.hitbox)) {// Vérifier si le joueur regarde dans la direction de l'objet
                         boolean regardeBonneDirection = false;
@@ -293,7 +305,7 @@ public class Map extends JPanel {
                 }
                 // Test de collision avec les objets interactifs
                 Rectangle joueurBox = new Rectangle(joueur.x, joueur.y, taille, taille);
-                for (Objet obj : objets) {
+                for (Objet obj : objetsParMap.get(displayedMap)) {
                     if (joueurBox.intersects(obj.hitbox)) {
                         if (e.getKeyCode() == java.awt.event.KeyEvent.VK_A) {
                             obj.trigger();
@@ -408,7 +420,7 @@ public class Map extends JPanel {
                 g.fillRect(mur.x, mur.y, mur.width, mur.height);
             }
             // Dessiner les objets interactifs en debug
-            for (Objet obj : objets) {
+            for (Objet obj : objetsParMap.get(displayedMap)) {
                 // Objet actif (joueur regarde dans sa direction) : vert plus vif
                 if (obj.isActive()) {
                     g.setColor(new Color(0, 255, 0, 160));

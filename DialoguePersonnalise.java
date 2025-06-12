@@ -117,7 +117,6 @@ public class DialoguePersonnalise extends JPanel {
                 currentMessage += chars[currentIndex];
                 labelMessage.setText(currentMessage);
                 currentIndex++;
-                System.out.println("Texte actuel : " + currentMessage);
             } else {
                 animationTimer.stop();
             }
