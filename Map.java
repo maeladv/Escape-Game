@@ -6,76 +6,142 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.List;
+
+// Ajout de l'import de la classe Objet
+// (pas besoin d'import si Objet.java est dans le même dossier et sans package)
 
 public class Map extends JPanel {
     int width;
     int height;
     Joueur joueur;
-    String[] mapPath = {"assets/map1.png"};
-    BufferedImage mapImage;
+    int displayedMap = 0; // Indice de la map affichée, utile si on veut changer de map
+    String[] mapPath = {"assets/maps/intro/map.png","assets/maps/library/map.png"};
+    String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png"};
+    BufferedImage mapImage; // permet de stocker l'image de la map
     ArrayList<Rectangle> murs = new ArrayList<>();
-    boolean devMode = true; // Option de développement, à désactiver en prod
+    boolean devMode = false; // Option de développement, à désactiver en prod
+
+    // Liste de listes de murs, un ensemble de murs par map
+    private List<List<Rectangle>> mursParMap = new ArrayList<>();
 
     private List<Layer> layers;
 
-    // create and init map
+    // Système d'objets interactifs
+    private List<List<Objet>> objetsParMap = new ArrayList<>();
+    private ArrayList<Objet> objets = new ArrayList<>();
+
+    // Création et initialisation de la map
     public Map() {
         this.width = 800;
         this.height = 600;
+        // Chargement de l'image de la map
         try {
-            mapImage = ImageIO.read(new File(mapPath[0]));
+            mapImage = ImageIO.read(new File(mapPath[displayedMap]));
         } catch (IOException e) {
             e.printStackTrace();
+            printDev("Erreur lors du chargement de l'image de la map : " + e.getMessage());
         }
         this.setPreferredSize(new Dimension(width, height));
-        joueur = new Joueur("Joueur", width/2-20, height/2-20, 10);
-        // Murs
+        joueur = new Joueur("Joueur", 30, 460, 10);
+
+        // Initialisation des murs pour chaque map
+
+        // Map 0 : Introduction
+        List<Rectangle> mursIntro = new ArrayList<>();
         // bords de la map
-        murs.add(new Rectangle (-20,0,20,this.height));
-        murs.add(new Rectangle (0, -20,this.width, 20));
-        murs.add(new Rectangle(785,0,10,this.height));
-        murs.add(new Rectangle(0,this.height,this.width,20));
+        mursIntro.add(new Rectangle (-20,0,20,this.height));
+        mursIntro.add(new Rectangle (0, -20,this.width, 20));
+        mursIntro.add(new Rectangle(this.width,0,10,this.height));
+        mursIntro.add(new Rectangle(0,this.height,this.width,20));
+        // limite chemin supérieure
+        mursIntro.add(new Rectangle(0, 340, 520, 100));
+        // limite inférieure
+        mursIntro.add(new Rectangle(0, 520, this.width, 100));
 
+        // porte d'entrée
+        mursIntro.add(new Rectangle(520, 300, 120, 100));
+
+        // suite porte à droite
+        mursIntro.add(new Rectangle(640, 340, 200, 100));
+    
+        
+        mursParMap.add(mursIntro);
+
+        // Objets map 0 (intro)
+        List<Objet> objetsIntro = new ArrayList<>();
+        // Nouvel objet ajouté à la map 0
+        objetsIntro.add(new Objet(
+            new Rectangle(540, 310, 70, 110),
+            () -> {
+                setDisplayedMap(1);
+                // Met à jour les murs et objets pour la nouvelle map
+                murs = new ArrayList<>(mursParMap.get(displayedMap));
+                objets = new ArrayList<>(objetsParMap.get(displayedMap));
+                printDev("Interaction avec la porte de la map 0 ! Changement de map.");
+                repaint();
+            }
+        ));
+        objetsParMap.add(objetsIntro);
+
+
+
+
+
+
+        // Map 1 :  Bibliothèque
+        List<Rectangle> mursBibliotheque = new ArrayList<>();
+        // bords de la map
+        mursBibliotheque.add(new Rectangle (-20,0,20,this.height));
+        mursBibliotheque.add(new Rectangle (0, -20,this.width, 20));
+        mursBibliotheque.add(new Rectangle(this.width - 15,0,10,this.height));
+        mursBibliotheque.add(new Rectangle(0,this.height,this.width,20));
         // mur bas gauche
-        murs.add(new Rectangle(0,450,150,50));
+        mursBibliotheque.add(new Rectangle(0,450,150,50));
         // mur bas centre
-        murs.add(new Rectangle(290,450,90,50));
-        murs.add(new Rectangle(380,450,48,50));
-        murs.add(new Rectangle(480,450,40,50));
-
-        //mur vertical
-        murs.add(new Rectangle(370,90,10,this.height));
-        murs.add(new Rectangle(525,275,10,this.height));
-        
+        mursBibliotheque.add(new Rectangle(290,450,90,50));
+        mursBibliotheque.add(new Rectangle(380,450,48,50));
+        mursBibliotheque.add(new Rectangle(480,450,40,50));
+        // mur vertical
+        mursBibliotheque.add(new Rectangle(370,90,10,this.height));
+        mursBibliotheque.add(new Rectangle(525,275,10,this.height));
         // mur bas droite
-        murs.add(new Rectangle(540,430,40,50));
-        murs.add(new Rectangle(690,440,90,50));
-
-        //mur millieu droite
-        murs.add(new Rectangle(660,270,150,50));
-
+        mursBibliotheque.add(new Rectangle(540,430,40,50));
+        mursBibliotheque.add(new Rectangle(690,440,90,50));
+        // mur millieu droite
+        mursBibliotheque.add(new Rectangle(660,270,150,50));
         // mur millieu
-        murs.add(new Rectangle(250,265,340,50));
-
+        mursBibliotheque.add(new Rectangle(250,265,340,50));
         // mur millieu gauche
-        murs.add(new Rectangle(75,265,105,50));
-        murs.add(new Rectangle(75,285,10,50));
-
+        mursBibliotheque.add(new Rectangle(75,265,105,50));
+        mursBibliotheque.add(new Rectangle(75,285,10,50));
         // mur haut gauche
-        murs.add(new Rectangle(0,0,190,135));
-
+        mursBibliotheque.add(new Rectangle(0,0,190,135));
         // mur haut centre
-        murs.add(new Rectangle(245,90,200,50));
-
+        mursBibliotheque.add(new Rectangle(245,90,200,50));
         // mur haut droite
-        murs.add(new Rectangle(580,0,200,130));
-
+        mursBibliotheque.add(new Rectangle(580,0,200,130));
         // tables
-        murs.add(new Rectangle(200, 355, 35, 30));
-        murs.add(new Rectangle(597, 515, 45, 20));
+        mursBibliotheque.add(new Rectangle(200, 355, 35, 30));
+        mursBibliotheque.add(new Rectangle(600, 515, 45, 20));
+        mursParMap.add(mursBibliotheque);
 
+
+        // Objets map 1 (bibliothèque)
+        List<Objet> objetsBibliotheque = new ArrayList<>();
         
+        objetsBibliotheque.add(new Objet(
+            new Rectangle(600, 515, 45,20),
+            () -> printDev("Collision avec un objet de la bibliothèque !")
+        ));
+        objetsParMap.add(objetsBibliotheque);
 
+
+
+        // On initialise la liste de murs courante
+        murs = new ArrayList<>(mursParMap.get(displayedMap));
+        // On initialise la liste d'objets courante
+        objets = new ArrayList<>(objetsParMap.get(displayedMap));
 
         layers = new ArrayList<>();
 
@@ -85,16 +151,20 @@ public class Map extends JPanel {
         Layer topLayer = new Layer();
         BufferedImage map2Image = null;
         try {
-            map2Image = ImageIO.read(new File("assets/map2.png"));
+            map2Image = ImageIO.read(new File(secondLayerPath[displayedMap]));
         } catch (IOException e) {
             e.printStackTrace();
+            printDev("Erreur lors du chargement de l'image de la deuxième couche : " + e.getMessage());
         }
-        final BufferedImage finalMap2Image = map2Image;
+        // Utilise un tableau pour stocker les images de topLayer pour chaque map
+        final BufferedImage[] finalMap2Images = new BufferedImage[secondLayerPath.length];
+        finalMap2Images[displayedMap] = map2Image;
         topLayer.addElement(new Drawable() {
             @Override
             public void draw(Graphics g) {
-                if (finalMap2Image != null) {
-                    g.drawImage(finalMap2Image, 0, 0, width, height, null);
+                BufferedImage img = finalMap2Images[displayedMap];
+                if (img != null) {
+                    g.drawImage(img, 0, 0, width, height, null);
                 }
             }
         });
@@ -173,6 +243,53 @@ public class Map extends JPanel {
                         case java.awt.event.KeyEvent.VK_DOWN:
                             joueur.deplacerBas();
                             break;
+                    }                }                // Test de proximité avec les objets interactifs
+                // Zone de proximité réduite - le joueur doit être collé à l'objet
+                // On ajoute seulement 10 pixels de marge au lieu de 20
+                Rectangle zoneInteraction = new Rectangle(joueur.x - 5, joueur.y - 5, taille + 10, taille + 10);
+                
+                for (Objet obj : objets) {
+                    // Vérifier si le joueur est proche de l'objet
+                    if (zoneInteraction.intersects(obj.hitbox)) {// Vérifier si le joueur regarde dans la direction de l'objet
+                        boolean regardeBonneDirection = false;
+                        
+                        // Calculer la position relative de l'objet par rapport au joueur
+                        int centreObjetX = obj.hitbox.x + obj.hitbox.width / 2;
+                        int centreObjetY = obj.hitbox.y + obj.hitbox.height / 2;
+                        int centreJoueurX = joueur.x + taille / 2;
+                        int centreJoueurY = joueur.y + taille / 2;
+                        
+                        // Déterminer si le joueur regarde dans la direction de l'objet
+                        // État 0: gauche, 1: droite, 2: haut, 3: bas
+                        switch (joueur.state) {
+                            case 0: // Gauche
+                                regardeBonneDirection = centreObjetX < centreJoueurX;
+                                break;
+                            case 1: // Droite
+                                regardeBonneDirection = centreObjetX > centreJoueurX;
+                                break;
+                            case 2: // Haut
+                                regardeBonneDirection = centreObjetY < centreJoueurY;
+                                break;
+                            case 3: // Bas
+                                regardeBonneDirection = centreObjetY > centreJoueurY;
+                                break;
+                        }
+                          // Marquer l'objet comme actif s'il est dans la bonne direction
+                        obj.setActive(regardeBonneDirection);
+                        
+                        // Afficher un message d'aide en mode développement
+                        if (devMode && regardeBonneDirection) {
+                            printDev("Objet interactif à proximité immédiate. Appuyez sur 'A' pour interagir.");
+                        }
+                        
+                        // Si le joueur appuie sur 'a' et regarde dans la bonne direction, déclencher l'action
+                        if (e.getKeyCode() == java.awt.event.KeyEvent.VK_A && regardeBonneDirection) {
+                            obj.trigger();
+                        }
+                    } else {
+                        // Si le joueur n'est pas à proximité, l'objet n'est pas actif
+                        obj.setActive(false);
                     }
                 }
                 repaint();
@@ -219,19 +336,39 @@ public class Map extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        //  Dessiner tous les layers de la map
         for (Layer layer : layers) {
             layer.draw(g);
         }
-        // Dessiner les murs pour debug (en couleur vive)
+        // Si le mode développeur est activé, on affiche plus d'informations
         if (devMode ) {
+            // Dessiner les murs pour debug (en couleur vive)
             g.setColor(new Color(255,255,255,50));
-        } else {
-            g.setColor(new Color(0, 0, 0, 0)); // Transparent color
+            for (Rectangle mur : murs) {
+                g.fillRect(mur.x, mur.y, mur.width, mur.height);
+            }
+            // Dessiner les objets interactifs en debug
+            for (Objet obj : objets) {
+                // Objet actif (joueur regarde dans sa direction) : vert plus vif
+                if (obj.isActive()) {
+                    g.setColor(new Color(0, 255, 0, 160));
+                } else {
+                    // Objet inactif : vert plus transparent
+                    g.setColor(new Color(0, 255, 0, 80));
+                }
+                g.fillRect(obj.hitbox.x, obj.hitbox.y, obj.hitbox.width, obj.hitbox.height);
+            }
         }
-        for (Rectangle mur : murs) {
-            g.fillRect(mur.x, mur.y, mur.width, mur.height);
+    }
+
+
+
+
+    // affichage en mode développeur uniquement
+    private void printDev(String message) {
+        if (devMode) {
+            System.out.println(message);
         }
-        // SUPPRIME : dessin du joueur hors layers
     }
 
     
@@ -244,5 +381,33 @@ public class Map extends JPanel {
     }
     public int getHeight() {
         return height;
+    }    // setteurs
+    // displayedMap
+    void setDisplayedMap(int displayedMap) {
+        this.displayedMap = displayedMap;
+        // Charger la nouvelle image de la map
+        try {
+            mapImage = ImageIO.read(new File(mapPath[displayedMap]));
+            // Mettre à jour aussi l'image de la couche supérieure
+            BufferedImage map2Image = ImageIO.read(new File(secondLayerPath[displayedMap]));
+            // Mettre à jour finalMap2Images dans topLayer
+            final BufferedImage[] finalMap2Images = new BufferedImage[secondLayerPath.length];
+            finalMap2Images[displayedMap] = map2Image;
+            // Recréer topLayer
+            layers.get(2).clear(); // On vide la couche supérieure
+            layers.get(2).addElement(new Drawable() {
+                @Override
+                public void draw(Graphics g) {
+                    BufferedImage img = finalMap2Images[displayedMap];
+                    if (img != null) {
+                        g.drawImage(img, 0, 0, width, height, null);
+                    }
+                }
+            });
+            joueur.setPosition(50, 540);
+        } catch (IOException e) {
+            e.printStackTrace();
+            printDev("Erreur lors du chargement de l'image de la map : " + e.getMessage());
+        }
     }
 }
