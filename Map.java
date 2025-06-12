@@ -247,7 +247,6 @@ public class Map extends JPanel {
                             joueur.deplacerBas();
                             break;
                     }                }                // Test de proximité avec les objets interactifs
-                Rectangle joueurBox = new Rectangle(joueur.x, joueur.y, taille, taille);
                 // Zone de proximité réduite - le joueur doit être collé à l'objet
                 // On ajoute seulement 10 pixels de marge au lieu de 20
                 Rectangle zoneInteraction = new Rectangle(joueur.x - 5, joueur.y - 5, taille + 10, taille + 10);
