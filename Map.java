@@ -20,7 +20,7 @@ public class Map extends JPanel {
     String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png"};
     BufferedImage mapImage; // permet de stocker l'image de la map
     ArrayList<Rectangle> murs = new ArrayList<>();
-    boolean devMode = false; // Option de développement, à désactiver en prod
+    boolean devMode = true; // Option de développement, à désactiver en prod
 
     // Liste de listes de murs, un ensemble de murs par map
     private List<List<Rectangle>> mursParMap = new ArrayList<>();
@@ -129,10 +129,10 @@ public class Map extends JPanel {
 
         // Objets map 1 (bibliothèque)
         List<Objet> objetsBibliotheque = new ArrayList<>();
-        
+        // Table avec déclenchement d'une boîte de dialogue au clic sur A
         objetsBibliotheque.add(new Objet(
-            new Rectangle(600, 515, 45,20),
-            () -> printDev("Collision avec un objet de la bibliothèque !")
+            new Rectangle(600, 510, 50, 20),
+            () -> afficherDialogue("Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.")
         ));
         objetsParMap.add(objetsBibliotheque);
 
@@ -290,6 +290,15 @@ public class Map extends JPanel {
                     } else {
                         // Si le joueur n'est pas à proximité, l'objet n'est pas actif
                         obj.setActive(false);
+                    }
+                }
+                // Test de collision avec les objets interactifs
+                Rectangle joueurBox = new Rectangle(joueur.x, joueur.y, taille, taille);
+                for (Objet obj : objets) {
+                    if (joueurBox.intersects(obj.hitbox)) {
+                        if (e.getKeyCode() == java.awt.event.KeyEvent.VK_A) {
+                            obj.trigger();
+                        }
                     }
                 }
                 repaint();
