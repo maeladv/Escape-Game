@@ -394,7 +394,6 @@ public class Map extends JPanel {
             // Mettre à jour aussi l'image de la couche supérieure
             BufferedImage map2Image = ImageIO.read(new File(secondLayerPath[displayedMap]));
             // Mettre à jour finalMap2Images dans topLayer
-            final BufferedImage[] finalMap2Images = new BufferedImage[secondLayerPath.length];
             finalMap2Images[displayedMap] = map2Image;
             // Recréer topLayer
             layers.get(2).clear(); // On vide la couche supérieure
