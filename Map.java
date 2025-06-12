@@ -132,15 +132,13 @@ public class Map extends JPanel {
         mursBibliotheque.add(new Rectangle(580,0,200,130));
         // tables
         mursBibliotheque.add(new Rectangle(200, 355, 35, 30));
-        mursBibliotheque.add(new Rectangle(600, 515, 45, 20));
-        mursParMap.add(mursBibliotheque);
+        mursBibliotheque.add(new Rectangle(600, 515, 45, 20));        mursParMap.add(mursBibliotheque);
         // Objets map 1 (bibliothèque)
         List<Objet> objetsBibliotheque = new ArrayList<>();
-        objetsParMap.add(objetsBibliotheque);
-
+        
         objetsBibliotheque.add(new Objet(
             new Rectangle(600, 515, 45,20),
-            () -> printDev("Collision avec l'objet de test de la map 0 !")
+            () -> printDev("Collision avec un objet de la bibliothèque !")
         ));
         objetsParMap.add(objetsBibliotheque);
 
@@ -325,11 +323,33 @@ public class Map extends JPanel {
     }
     public int getHeight() {
         return height;
-    }
-
-    // setteurs
+    }    // setteurs
     // displayedMap
     void setDisplayedMap(int displayedMap) {
         this.displayedMap = displayedMap;
+        // Charger la nouvelle image de la map
+        try {
+            mapImage = ImageIO.read(new File(mapPath[displayedMap]));
+            // Mettre à jour aussi l'image de la couche supérieure
+            BufferedImage map2Image = ImageIO.read(new File(secondLayerPath[displayedMap]));
+            // Mettre à jour finalMap2Images dans topLayer
+            final BufferedImage[] finalMap2Images = new BufferedImage[secondLayerPath.length];
+            finalMap2Images[displayedMap] = map2Image;
+            // Recréer topLayer
+            layers.get(2).clear(); // On vide la couche supérieure
+            layers.get(2).addElement(new Drawable() {
+                @Override
+                public void draw(Graphics g) {
+                    BufferedImage img = finalMap2Images[displayedMap];
+                    if (img != null) {
+                        g.drawImage(img, 0, 0, width, height, null);
+                    }
+                }
+            });
+            joueur.setPosition(50, 540);
+        } catch (IOException e) {
+            e.printStackTrace();
+            printDev("Erreur lors du chargement de l'image de la map : " + e.getMessage());
+        }
     }
 }

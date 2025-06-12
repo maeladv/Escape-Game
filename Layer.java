@@ -11,6 +11,10 @@ public class Layer {
     public void addElement(Drawable element) {
         elements.add(element);
     }
+    
+    public void clear() {
+        elements.clear();
+    }
 
     public void draw(Graphics g) {
         for (Drawable element : elements) {
