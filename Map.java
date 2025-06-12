@@ -6,12 +6,20 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
+import java.awt.Color;
+import java.awt.Graphics;
+
+// Ajout de l'import de la classe Objet
+// (pas besoin d'import si Objet.java est dans le même dossier et sans package)
 
 public class Map extends JPanel {
     int width;
     int height;
     Joueur joueur;
-    int displayedMap = 0; // Indice de la map affichée, utile si on veut changer de map
+    int displayedMap = 1; // Indice de la map affichée, utile si on veut changer de map
     String[] mapPath = {"assets/maps/intro/map.png","assets/maps/library/map.png"};
     String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png"};
     BufferedImage mapImage; // permet de stocker l'image de la map
@@ -22,6 +30,10 @@ public class Map extends JPanel {
     private List<List<Rectangle>> mursParMap = new ArrayList<>();
 
     private List<Layer> layers;
+
+    // Système d'objets interactifs
+    private List<List<Objet>> objetsParMap = new ArrayList<>();
+    private ArrayList<Objet> objets = new ArrayList<>();
 
     // Création et initialisation de la map
     public Map() {
@@ -46,7 +58,6 @@ public class Map extends JPanel {
         mursIntro.add(new Rectangle (0, -20,this.width, 20));
         mursIntro.add(new Rectangle(this.width,0,10,this.height));
         mursIntro.add(new Rectangle(0,this.height,this.width,20));
-
         // limite chemin supérieure
         mursIntro.add(new Rectangle(0, 340, 520, 100));
         // limite inférieure
@@ -60,6 +71,15 @@ public class Map extends JPanel {
     
         
         mursParMap.add(mursIntro);
+
+        // Objets map 0 (intro)
+        List<Objet> objetsIntro = new ArrayList<>();
+        // Exemple : objet de test
+        objetsIntro.add(new Objet(
+            new Rectangle(300, 200, 60, 60),
+            () -> printDev("Collision avec l'objet de test de la map 0 !")
+        ));
+        objetsParMap.add(objetsIntro);
 
 
 
@@ -102,10 +122,22 @@ public class Map extends JPanel {
         mursBibliotheque.add(new Rectangle(200, 355, 35, 30));
         mursBibliotheque.add(new Rectangle(600, 515, 45, 20));
         mursParMap.add(mursBibliotheque);
+        // Objets map 1 (bibliothèque)
+        List<Objet> objetsBibliotheque = new ArrayList<>();
+        objetsParMap.add(objetsBibliotheque);
+
+        objetsBibliotheque.add(new Objet(
+            new Rectangle(600, 515, 45,20),
+            () -> printDev("Collision avec l'objet de test de la map 0 !")
+        ));
+        objetsParMap.add(objetsBibliotheque);
+
 
 
         // On initialise la liste de murs courante
         murs = new ArrayList<>(mursParMap.get(displayedMap));
+        // On initialise la liste d'objets courante
+        objets = new ArrayList<>(objetsParMap.get(displayedMap));
 
         layers = new ArrayList<>();
 
@@ -206,6 +238,13 @@ public class Map extends JPanel {
                             break;
                     }
                 }
+                // Test de collision avec les objets interactifs
+                Rectangle joueurBox = new Rectangle(joueur.x, joueur.y, taille, taille);
+                for (Objet obj : objets) {
+                    if (joueurBox.intersects(obj.hitbox)) {
+                        obj.trigger();
+                    }
+                }
                 repaint();
             }
         });
@@ -245,6 +284,13 @@ public class Map extends JPanel {
         }
         for (Rectangle mur : murs) {
             g.fillRect(mur.x, mur.y, mur.width, mur.height);
+        }
+        // Dessiner les objets interactifs en debug
+        if (devMode) {
+            g.setColor(new Color(0,255,0,80));
+            for (Objet obj : objets) {
+                g.fillRect(obj.hitbox.x, obj.hitbox.y, obj.hitbox.width, obj.hitbox.height);
+            }
         }
         // SUPPRIME : dessin du joueur hors layers
     }
