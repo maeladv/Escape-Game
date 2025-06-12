@@ -9,3 +9,17 @@ Le jeu se se plongera dans un univers mysterieux et ensorcelé. Il était une fo
 
 -> Dans chaque partie de la bibliothèque, le joueur pourra effectuer des défis et résoudre des énigmes pour trouver des morceaux du code secret final.
 -> Monde 2D où le personnage peut se déplacer
+
+
+
+
+## Déroulé du jeu
+
+1. Introduction
+   - Démarrage avec une image de la foret et de la bibliothèque (le joueur peur rentrer dans la bibliothèque)
+   - Le script de l'histoire apparait dans un context box
+   - Le joueur rentre
+2. la map de la bibliothèque apparait
+ - On obtient plus de contexte sur l'histoire et les objectisf du jeu
+  
+3. certains objets peuvent s'activer au clic sur A -> Une image / mini jeu s'affiche par dessus la map
