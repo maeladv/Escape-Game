@@ -319,8 +319,13 @@ public class Map extends JPanel {
         if (displayedMap == 0) {
             String[] introScript = {
                 "Bienvenue dans Escape From The Biblioteca !", 
-                "Vous vous retrouvez dans une bibliotheque mysterieuse ou le temps s'est arrete...", 
-                "Explorez, resolvez des enigmes et tentez de lever la malediction ! Bonne chance !"
+                "Que voit-on au loin ? Une coline ? Un vieux village ?",
+                "Je ne sais pas, cette foret est si sombre et si dense...",
+                "Et que voici par ici ? Un vieux batiment ? Peut-etre un chateau abandonne ?",
+                "Enfin, c'est etrange, il n'y a pas un bruit et des torches sont encore allumees !",
+                "On pourrait croire que quelqu'un vit encore ici...",
+                "Cette foret ne m'inspire pas confiance mais... le temps semble s'y etre fige.",
+                "La nuit tombe, je n'ai d'autre choix que d'entrer dans ce batiment.",
             };
             afficherScript(introScript, "Suivant");
         }
