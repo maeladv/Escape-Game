@@ -1,0 +1,20 @@
+import java.awt.Graphics;
+import java.util.ArrayList;
+
+public class Layer {
+    private ArrayList<Drawable> elements;
+
+    public Layer() {
+        elements = new ArrayList<>();
+    }
+
+    public void addElement(Drawable element) {
+        elements.add(element);
+    }
+
+    public void draw(Graphics g) {
+        for (Drawable element : elements) {
+            element.draw(g);
+        }
+    }
+}
