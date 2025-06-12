@@ -13,7 +13,7 @@ public class Map extends JPanel {
     Joueur joueur;
     int displayedMap = 0; // Indice de la map affichée, utile si on veut changer de map
     String[] mapPath = {"assets/maps/intro/map.png","assets/maps/library/map.png"};
-    String[] secondLayerPath = {"","assets/maps/library/layer.png"};
+    String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png"};
     BufferedImage mapImage; // permet de stocker l'image de la map
     ArrayList<Rectangle> murs = new ArrayList<>();
     boolean devMode = true; // Option de développement, à désactiver en prod
