@@ -314,6 +314,16 @@ public class Map extends JPanel {
                 }
             }
         });
+        
+        // Script d'introduction (exemple)
+        if (displayedMap == 0) {
+            String[] introScript = {
+                "Bienvenue dans Escape From The Biblioteca !", 
+                "Vous vous retrouvez dans une bibliotheque mysterieuse ou le temps s'est arrete...", 
+                "Explorez, resolvez des enigmes et tentez de lever la malediction ! Bonne chance !"
+            };
+            afficherScript(introScript, "Suivant");
+        }
     }
 
     // Méthode pour déplacer le joueur aux coordonnées de la souris
@@ -324,20 +334,57 @@ public class Map extends JPanel {
         }
     }
 
-    // Méthode pour afficher un dialogue personnalisé au-dessus de la carte
-    private void afficherDialogue(String message) {
+    // Méthode pour afficher une séquence de dialogues (script)
+    private void afficherScript(String[] messages, String boutonTexte) {
+        if (messages == null || messages.length == 0) return;
+        joueur.canMove = false;
+        final int[] index = {0};
+        Runnable nextDialogue = new Runnable() {
+            @Override
+            public void run() {
+                if (index[0] < messages.length - 1) {
+                    index[0]++;
+                    afficherDialogue(messages[index[0]], boutonTexte, this);
+                } else {
+                    joueur.canMove = true;
+                }
+            }
+        };
+        afficherDialogue(messages[0], boutonTexte, nextDialogue);
+    }
+
+    // Surcharge de la méthode afficherDialogue pour accepter le texte du bouton
+    private void afficherDialogue(String message, String boutonTexte, Runnable onClose) {
+        joueur.canMove = false;
         final DialoguePersonnalise[] dialogueWrapper = new DialoguePersonnalise[1];
-        dialogueWrapper[0] = new DialoguePersonnalise(message, () -> {
-            remove(dialogueWrapper[0]); // Supprimer le dialogue après fermeture
-            revalidate(); // Revalider le layout après suppression
-            repaint(); // Rafraîchir l'affichage
+        dialogueWrapper[0] = new DialoguePersonnalise(message, boutonTexte, () -> {
+            remove(dialogueWrapper[0]);
+            onClose.run();
+            revalidate();
+            repaint();
         });
         DialoguePersonnalise dialogue = dialogueWrapper[0];
-        add(dialogue); // Ajouter le dialogue avant de l'utiliser
+        add(dialogue);
         dialogue.setBounds((getWidth() - (getWidth() * 3 / 4)) / 2, getHeight() - getHeight() / 4 - 20, getWidth() * 3 / 4, getHeight() / 4);
-        setLayout(null); // Permet de positionner le dialogue avec des coordonnées absolues
-        revalidate(); // Revalider le layout après ajout
-        repaint(); // Rafraîchir l'affichage
+        setLayout(null);
+        revalidate();
+        repaint();
+    }
+
+    // Méthode pour afficher un dialogue personnalisé au-dessus de la carte
+    private void afficherDialogue(String message) {
+        afficherDialogue(message, "OK", () -> {
+            // Correction : ne pas retirer le dernier composant à l'aveugle
+            for (Component comp : getComponents()) {
+                if (comp instanceof DialoguePersonnalise) {
+                    remove(comp);
+                    break;
+                }
+            }
+            joueur.canMove = true;
+            revalidate();
+            repaint();
+        });
     }
 
     // Mettre à jour la position du joueur

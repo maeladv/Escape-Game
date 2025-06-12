@@ -13,7 +13,7 @@ public class DialoguePersonnalise extends JPanel {
     private int currentIndex = 0;
     private int animationSpeed = 40;
     private static final int MAX_LINES = 3;
-    private static final int MAX_CHARS_PER_LINE = 60;
+    private static final int MAX_CHARS_PER_LINE = 50;
 
     static {
         try {
@@ -29,7 +29,7 @@ public class DialoguePersonnalise extends JPanel {
         }
     }
 
-    public DialoguePersonnalise(String message, Runnable onClose) {
+    public DialoguePersonnalise(String message, String boutonTexte, Runnable onClose) {
         setLayout(new BorderLayout());
         setOpaque(true);
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30)); // Ajout du padding autour du panel
@@ -43,10 +43,15 @@ public class DialoguePersonnalise extends JPanel {
         labelMessage.setForeground(Color.BLACK);
         labelMessage.setFont(yosterFont);
         labelMessage.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // Padding interne du texte
+        labelMessage.setRows(MAX_LINES); // Fixe la hauteur avant l'animation
+        labelMessage.setColumns(MAX_CHARS_PER_LINE); // Ajouté pour garantir la largeur
+        labelMessage.setPreferredSize(new Dimension(700, 90)); // Largeur et hauteur fixes pour 3 lignes
         add(labelMessage, BorderLayout.CENTER);
         startTextAnimation();
 
-        JButton boutonOk = new JButton("OK");
+        if (boutonTexte == null || boutonTexte.length() == 0) boutonTexte = "OK";
+        if (boutonTexte.length() > 10) boutonTexte = boutonTexte.substring(0, 10);
+        JButton boutonOk = new JButton(boutonTexte);
         boutonOk.setIcon(new ImageIcon(new ImageIcon("assets/bouton.png").getImage().getScaledInstance(100, 50, Image.SCALE_SMOOTH)));
         boutonOk.setContentAreaFilled(false);
         boutonOk.setFocusPainted(false);
@@ -59,38 +64,44 @@ public class DialoguePersonnalise extends JPanel {
             if (animationTimer != null && animationTimer.isRunning()) animationTimer.stop();
             onClose.run();
         });
-        JPanel panelBoutons = new JPanel();
+        JPanel panelBoutons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         panelBoutons.setOpaque(false);
         panelBoutons.add(boutonOk);
         add(panelBoutons, BorderLayout.SOUTH);
+        // S'assurer que le bouton ne prend pas trop de place
+        panelBoutons.setMaximumSize(new Dimension(120, 60));
+        panelBoutons.setPreferredSize(new Dimension(120, 60));
+        panelBoutons.setMinimumSize(new Dimension(120, 60));
     }
 
     private String formatMessage(String message) {
+        // Formate le message sur 3 lignes max, coupe avec ... si trop long, sans couper les mots
         String[] words = message.split(" ");
-        StringBuilder formatted = new StringBuilder();
-        StringBuilder line = new StringBuilder();
-        int lineCount = 0;
+        StringBuilder[] lines = new StringBuilder[MAX_LINES];
+        for (int i = 0; i < MAX_LINES; i++) lines[i] = new StringBuilder();
+        int lineIdx = 0;
         for (String word : words) {
-            if (line.length() + word.length() + 1 > MAX_CHARS_PER_LINE) {
-                if (lineCount < MAX_LINES - 1) {
-                    formatted.append(line).append("\n");
-                    line = new StringBuilder(word);
-                    lineCount++;
+            if (lines[lineIdx].length() + word.length() + (lines[lineIdx].length() > 0 ? 1 : 0) > MAX_CHARS_PER_LINE) {
+                if (lineIdx < MAX_LINES - 1) {
+                    lineIdx++;
                 } else {
-                    String truncated = line.toString();
-                    if (truncated.length() > MAX_CHARS_PER_LINE - 3) {
-                        truncated = truncated.substring(0, MAX_CHARS_PER_LINE - 3);
+                    // Ajoute ... à la fin de la dernière ligne si le texte dépasse
+                    if (lines[lineIdx].length() > MAX_CHARS_PER_LINE - 3) {
+                        lines[lineIdx].setLength(MAX_CHARS_PER_LINE - 3);
                     }
-                    formatted.append(truncated).append("...");
-                    return formatted.toString();
+                    lines[lineIdx].append("...");
+                    break;
                 }
-            } else {
-                if (line.length() > 0) line.append(" ");
-                line.append(word);
             }
+            if (lines[lineIdx].length() > 0) lines[lineIdx].append(" ");
+            lines[lineIdx].append(word);
         }
-        if (line.length() > 0 && lineCount < MAX_LINES) {
-            formatted.append(line);
+        StringBuilder formatted = new StringBuilder();
+        for (int i = 0; i < MAX_LINES; i++) {
+            if (lines[i].length() > 0) {
+                if (formatted.length() > 0) formatted.append("\n");
+                formatted.append(lines[i]);
+            }
         }
         return formatted.toString();
     }
@@ -98,16 +109,22 @@ public class DialoguePersonnalise extends JPanel {
     private void startTextAnimation() {
         currentIndex = 0;
         currentMessage = "";
+        labelMessage.setRows(MAX_LINES);
+        // Correction : utiliser un tableau de caractères pour éviter les problèmes d'encodage
+        char[] chars = fullMessage.toCharArray();
         animationTimer = new Timer(animationSpeed, e -> {
-            if (currentIndex < fullMessage.length()) {
-                currentMessage += fullMessage.charAt(currentIndex);
+            if (currentIndex < chars.length) {
+                currentMessage += chars[currentIndex];
                 labelMessage.setText(currentMessage);
                 currentIndex++;
+                System.out.println("Texte actuel : " + currentMessage);
             } else {
                 animationTimer.stop();
             }
         });
         animationTimer.start();
+        labelMessage.repaint();
+        this.repaint();
     }
 
     public void setAnimationSpeed(int speedMs) {

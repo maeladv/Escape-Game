@@ -9,6 +9,7 @@ public class Joueur {
     String nom;
     int state; // 0 : gauche, 1 : droite, 2 : haut, 3 : bas
     int speed;
+    boolean canMove = true; // Indique si le joueur peut se déplacer
     // Ordre : gauche, droite, haut, bas
     String[] image_paths = {"assets/joueur/gauche.png", "assets/joueur/droite.png", "assets/joueur/haut.png", "assets/joueur/bas.png"};
     BufferedImage[] joueurImages = new BufferedImage[4];
