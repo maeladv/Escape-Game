@@ -41,6 +41,7 @@ public class Map extends JPanel {
         // mur bas centre
         murs.add(new Rectangle(290,450,90,50));
         murs.add(new Rectangle(380,450,48,50));
+        murs.add(new Rectangle(480,450,40,50));
 
         //mur vertical
         murs.add(new Rectangle(370,90,10,this.height));
