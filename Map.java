@@ -74,20 +74,15 @@ public class Map extends JPanel {
 
         // Objets map 0 (intro)
         List<Objet> objetsIntro = new ArrayList<>();
-        // Exemple : objet de test
-        objetsIntro.add(new Objet(
-            new Rectangle(300, 200, 60, 60),
-            () -> printDev("Collision avec l'objet de test de la map 0 !")
-        ));
         // Nouvel objet ajouté à la map 0
         objetsIntro.add(new Objet(
-            new Rectangle(540, 420, 70, 110),
+            new Rectangle(540, 310, 70, 110),
             () -> {
                 setDisplayedMap(1);
                 // Met à jour les murs et objets pour la nouvelle map
                 murs = new ArrayList<>(mursParMap.get(displayedMap));
                 objets = new ArrayList<>(objetsParMap.get(displayedMap));
-                printDev("Collision avec la porte de la map 0 ! Changement de map.");
+                printDev("Interaction avec la porte de la map 0 ! Changement de map.");
                 repaint();
             }
         ));
