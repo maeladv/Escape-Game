@@ -19,7 +19,7 @@ public class Map extends JPanel {
     int width;
     int height;
     Joueur joueur;
-    int displayedMap = 1; // Indice de la map affichée, utile si on veut changer de map
+    int displayedMap = 0; // Indice de la map affichée, utile si on veut changer de map
     String[] mapPath = {"assets/maps/intro/map.png","assets/maps/library/map.png"};
     String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png"};
     BufferedImage mapImage; // permet de stocker l'image de la map
@@ -78,6 +78,18 @@ public class Map extends JPanel {
         objetsIntro.add(new Objet(
             new Rectangle(300, 200, 60, 60),
             () -> printDev("Collision avec l'objet de test de la map 0 !")
+        ));
+        // Nouvel objet ajouté à la map 0
+        objetsIntro.add(new Objet(
+            new Rectangle(540, 420, 70, 110),
+            () -> {
+                setDisplayedMap(1);
+                // Met à jour les murs et objets pour la nouvelle map
+                murs = new ArrayList<>(mursParMap.get(displayedMap));
+                objets = new ArrayList<>(objetsParMap.get(displayedMap));
+                printDev("Collision avec la porte de la map 0 ! Changement de map.");
+                repaint();
+            }
         ));
         objetsParMap.add(objetsIntro);
 
@@ -313,5 +325,11 @@ public class Map extends JPanel {
     }
     public int getHeight() {
         return height;
+    }
+
+    // setteurs
+    // displayedMap
+    void setDisplayedMap(int displayedMap) {
+        this.displayedMap = displayedMap;
     }
 }
