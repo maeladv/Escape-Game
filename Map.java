@@ -11,71 +11,101 @@ public class Map extends JPanel {
     int width;
     int height;
     Joueur joueur;
-    String[] mapPath = {"assets/map1.png"};
-    BufferedImage mapImage;
+    int displayedMap = 0; // Indice de la map affichée, utile si on veut changer de map
+    String[] mapPath = {"assets/maps/intro/map.png","assets/maps/library/map.png"};
+    String[] secondLayerPath = {"","assets/maps/library/layer.png"};
+    BufferedImage mapImage; // permet de stocker l'image de la map
     ArrayList<Rectangle> murs = new ArrayList<>();
     boolean devMode = true; // Option de développement, à désactiver en prod
 
+    // Liste de listes de murs, un ensemble de murs par map
+    private List<List<Rectangle>> mursParMap = new ArrayList<>();
+
     private List<Layer> layers;
 
-    // create and init map
+    // Création et initialisation de la map
     public Map() {
         this.width = 800;
         this.height = 600;
+        // Chargement de l'image de la map
         try {
-            mapImage = ImageIO.read(new File(mapPath[0]));
+            mapImage = ImageIO.read(new File(mapPath[displayedMap]));
         } catch (IOException e) {
             e.printStackTrace();
+            printDev("Erreur lors du chargement de l'image de la map : " + e.getMessage());
         }
         this.setPreferredSize(new Dimension(width, height));
         joueur = new Joueur("Joueur", width/2-20, height/2-20, 10);
-        // Murs
+
+        // Initialisation des murs pour chaque map
+
+        // Map 0 : Introduction
+        List<Rectangle> mursIntro = new ArrayList<>();
         // bords de la map
-        murs.add(new Rectangle (-20,0,20,this.height));
-        murs.add(new Rectangle (0, -20,this.width, 20));
-        murs.add(new Rectangle(785,0,10,this.height));
-        murs.add(new Rectangle(0,this.height,this.width,20));
+        mursIntro.add(new Rectangle (-20,0,20,this.height));
+        mursIntro.add(new Rectangle (0, -20,this.width, 20));
+        mursIntro.add(new Rectangle(this.width,0,10,this.height));
+        mursIntro.add(new Rectangle(0,this.height,this.width,20));
 
+        // limite chemin supérieure
+        mursIntro.add(new Rectangle(0, 340, 520, 100));
+        // limite inférieure
+        mursIntro.add(new Rectangle(0, 520, this.width, 100));
+
+        // porte d'entrée
+        mursIntro.add(new Rectangle(520, 300, 120, 100));
+
+        // suite porte à droite
+        mursIntro.add(new Rectangle(640, 340, 200, 100));
+    
+        
+        mursParMap.add(mursIntro);
+
+
+
+
+
+
+        // Map 1 :  Bibliothèque
+        List<Rectangle> mursBibliotheque = new ArrayList<>();
+        // bords de la map
+        mursBibliotheque.add(new Rectangle (-20,0,20,this.height));
+        mursBibliotheque.add(new Rectangle (0, -20,this.width, 20));
+        mursBibliotheque.add(new Rectangle(this.width - 15,0,10,this.height));
+        mursBibliotheque.add(new Rectangle(0,this.height,this.width,20));
         // mur bas gauche
-        murs.add(new Rectangle(0,450,150,50));
+        mursBibliotheque.add(new Rectangle(0,450,150,50));
         // mur bas centre
-        murs.add(new Rectangle(290,450,90,50));
-        murs.add(new Rectangle(380,450,48,50));
-        murs.add(new Rectangle(480,450,40,50));
-
-        //mur vertical
-        murs.add(new Rectangle(370,90,10,this.height));
-        murs.add(new Rectangle(525,275,10,this.height));
-        
+        mursBibliotheque.add(new Rectangle(290,450,90,50));
+        mursBibliotheque.add(new Rectangle(380,450,48,50));
+        mursBibliotheque.add(new Rectangle(480,450,40,50));
+        // mur vertical
+        mursBibliotheque.add(new Rectangle(370,90,10,this.height));
+        mursBibliotheque.add(new Rectangle(525,275,10,this.height));
         // mur bas droite
-        murs.add(new Rectangle(540,430,40,50));
-        murs.add(new Rectangle(690,440,90,50));
-
-        //mur millieu droite
-        murs.add(new Rectangle(660,270,150,50));
-
+        mursBibliotheque.add(new Rectangle(540,430,40,50));
+        mursBibliotheque.add(new Rectangle(690,440,90,50));
+        // mur millieu droite
+        mursBibliotheque.add(new Rectangle(660,270,150,50));
         // mur millieu
-        murs.add(new Rectangle(250,265,340,50));
-
+        mursBibliotheque.add(new Rectangle(250,265,340,50));
         // mur millieu gauche
-        murs.add(new Rectangle(75,265,105,50));
-        murs.add(new Rectangle(75,285,10,50));
-
+        mursBibliotheque.add(new Rectangle(75,265,105,50));
+        mursBibliotheque.add(new Rectangle(75,285,10,50));
         // mur haut gauche
-        murs.add(new Rectangle(0,0,190,135));
-
+        mursBibliotheque.add(new Rectangle(0,0,190,135));
         // mur haut centre
-        murs.add(new Rectangle(245,90,200,50));
-
+        mursBibliotheque.add(new Rectangle(245,90,200,50));
         // mur haut droite
-        murs.add(new Rectangle(580,0,200,130));
-
+        mursBibliotheque.add(new Rectangle(580,0,200,130));
         // tables
-        murs.add(new Rectangle(200, 355, 35, 30));
-        murs.add(new Rectangle(600, 515, 45, 20));
+        mursBibliotheque.add(new Rectangle(200, 355, 35, 30));
+        mursBibliotheque.add(new Rectangle(600, 515, 45, 20));
+        mursParMap.add(mursBibliotheque);
 
-        
 
+        // On initialise la liste de murs courante
+        murs = new ArrayList<>(mursParMap.get(displayedMap));
 
         layers = new ArrayList<>();
 
@@ -85,16 +115,20 @@ public class Map extends JPanel {
         Layer topLayer = new Layer();
         BufferedImage map2Image = null;
         try {
-            map2Image = ImageIO.read(new File("assets/map2.png"));
+            map2Image = ImageIO.read(new File(secondLayerPath[displayedMap]));
         } catch (IOException e) {
             e.printStackTrace();
+            printDev("Erreur lors du chargement de l'image de la deuxième couche : " + e.getMessage());
         }
-        final BufferedImage finalMap2Image = map2Image;
+        // Utilise un tableau pour stocker les images de topLayer pour chaque map
+        final BufferedImage[] finalMap2Images = new BufferedImage[secondLayerPath.length];
+        finalMap2Images[displayedMap] = map2Image;
         topLayer.addElement(new Drawable() {
             @Override
             public void draw(Graphics g) {
-                if (finalMap2Image != null) {
-                    g.drawImage(finalMap2Image, 0, 0, width, height, null);
+                BufferedImage img = finalMap2Images[displayedMap];
+                if (img != null) {
+                    g.drawImage(img, 0, 0, width, height, null);
                 }
             }
         });
@@ -213,6 +247,16 @@ public class Map extends JPanel {
             g.fillRect(mur.x, mur.y, mur.width, mur.height);
         }
         // SUPPRIME : dessin du joueur hors layers
+    }
+
+
+
+
+    // affichage en mode développeur
+    private void printDev(String message) {
+        if (devMode) {
+            System.out.println(message);
+        }
     }
 
 
