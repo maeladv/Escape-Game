@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Joueur {
-    int x, y;
+    int x, y; // Position du joueur
     String nom;
     int state; // 0 : gauche, 1 : droite, 2 : haut, 3 : bas
     int speed;

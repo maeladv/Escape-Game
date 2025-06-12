@@ -47,7 +47,7 @@ public class Map extends JPanel {
             printDev("Erreur lors du chargement de l'image de la map : " + e.getMessage());
         }
         this.setPreferredSize(new Dimension(width, height));
-        joueur = new Joueur("Joueur", width/2-20, height/2-20, 10);
+        joueur = new Joueur("Joueur", 17, 474, 10);
 
         // Initialisation des murs pour chaque map
 
