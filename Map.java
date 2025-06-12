@@ -136,12 +136,12 @@ public class Map extends JPanel {
             new Rectangle(70, 480, 50, 20),
             () -> {
                 String[] messages = {
-                    "Ah! Il semblerait que l'on puisse interagir avec ces bibliothèques.",
-                    "Ce vieux bâtiment est donc une bibliothèque.",
-                    "Elle me semble très ancienne et poussiéreuse. Certains murs tombent mêm en ruines !",
-                    "On dirait qu'elle n'a pas été utilisée depuis des années.",
-                    "Peut-être que quelqu'un a laissé un message ici ?",
-                    "Il y a des livres sur les étagères, mais certains sont trop poussiéreux pour être lus."
+                    "Ah! Il semblerait que l'on puisse interagir avec ces bibliotheques.",
+                    "Ce vieux batiment est donc une bibliotheque.",
+                    "Elle me semble très ancienne et poussiereuse. Certains murs tombent meme en ruines !",
+                    "On dirait qu'elle n'a pas ete utilisee depuis des annees.",
+                    "Peut-etre que quelqu'un a laisse un message ici ?",
+                    "Il y a des livres sur les etageres, mais certaines sont encore trop poussiereuses pour etre ouvertes."
                 };
                 afficherScript(messages, "Suivant");
         }
