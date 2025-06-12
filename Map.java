@@ -132,7 +132,9 @@ public class Map extends JPanel {
         mursBibliotheque.add(new Rectangle(580,0,200,130));
         // tables
         mursBibliotheque.add(new Rectangle(200, 355, 35, 30));
-        mursBibliotheque.add(new Rectangle(600, 515, 45, 20));        mursParMap.add(mursBibliotheque);
+        mursBibliotheque.add(new Rectangle(600, 515, 45, 20));
+        mursParMap.add(mursBibliotheque);
+
         // Objets map 1 (bibliothèque)
         List<Objet> objetsBibliotheque = new ArrayList<>();
         
@@ -246,13 +248,54 @@ public class Map extends JPanel {
                         case java.awt.event.KeyEvent.VK_DOWN:
                             joueur.deplacerBas();
                             break;
-                    }
-                }
-                // Test de collision avec les objets interactifs
+                    }                }                // Test de proximité avec les objets interactifs
                 Rectangle joueurBox = new Rectangle(joueur.x, joueur.y, taille, taille);
+                // Zone de proximité réduite - le joueur doit être collé à l'objet
+                // On ajoute seulement 10 pixels de marge au lieu de 20
+                Rectangle zoneInteraction = new Rectangle(joueur.x - 5, joueur.y - 5, taille + 10, taille + 10);
+                
                 for (Objet obj : objets) {
-                    if (joueurBox.intersects(obj.hitbox)) {
-                        obj.trigger();
+                    // Vérifier si le joueur est proche de l'objet
+                    if (zoneInteraction.intersects(obj.hitbox)) {// Vérifier si le joueur regarde dans la direction de l'objet
+                        boolean regardeBonneDirection = false;
+                        
+                        // Calculer la position relative de l'objet par rapport au joueur
+                        int centreObjetX = obj.hitbox.x + obj.hitbox.width / 2;
+                        int centreObjetY = obj.hitbox.y + obj.hitbox.height / 2;
+                        int centreJoueurX = joueur.x + taille / 2;
+                        int centreJoueurY = joueur.y + taille / 2;
+                        
+                        // Déterminer si le joueur regarde dans la direction de l'objet
+                        // État 0: gauche, 1: droite, 2: haut, 3: bas
+                        switch (joueur.state) {
+                            case 0: // Gauche
+                                regardeBonneDirection = centreObjetX < centreJoueurX;
+                                break;
+                            case 1: // Droite
+                                regardeBonneDirection = centreObjetX > centreJoueurX;
+                                break;
+                            case 2: // Haut
+                                regardeBonneDirection = centreObjetY < centreJoueurY;
+                                break;
+                            case 3: // Bas
+                                regardeBonneDirection = centreObjetY > centreJoueurY;
+                                break;
+                        }
+                          // Marquer l'objet comme actif s'il est dans la bonne direction
+                        obj.setActive(regardeBonneDirection);
+                        
+                        // Afficher un message d'aide en mode développement
+                        if (devMode && regardeBonneDirection) {
+                            printDev("Objet interactif à proximité immédiate. Appuyez sur 'A' pour interagir.");
+                        }
+                        
+                        // Si le joueur appuie sur 'a' et regarde dans la bonne direction, déclencher l'action
+                        if (e.getKeyCode() == java.awt.event.KeyEvent.VK_A && regardeBonneDirection) {
+                            obj.trigger();
+                        }
+                    } else {
+                        // Si le joueur n'est pas à proximité, l'objet n'est pas actif
+                        obj.setActive(false);
                     }
                 }
                 repaint();
@@ -294,11 +337,16 @@ public class Map extends JPanel {
         }
         for (Rectangle mur : murs) {
             g.fillRect(mur.x, mur.y, mur.width, mur.height);
-        }
-        // Dessiner les objets interactifs en debug
+        }        // Dessiner les objets interactifs en debug
         if (devMode) {
-            g.setColor(new Color(0,255,0,80));
             for (Objet obj : objets) {
+                // Objet actif (joueur regarde dans sa direction) : vert plus vif
+                if (obj.isActive()) {
+                    g.setColor(new Color(0, 255, 0, 160));
+                } else {
+                    // Objet inactif : vert plus transparent
+                    g.setColor(new Color(0, 255, 0, 80));
+                }
                 g.fillRect(obj.hitbox.x, obj.hitbox.y, obj.hitbox.width, obj.hitbox.height);
             }
         }
