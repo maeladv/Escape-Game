@@ -1,65 +1,117 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 
 public class DialoguePersonnalise extends JPanel {
     private static Image backgroundImage;
+    private static Font yosterFont;
+    private JTextArea labelMessage;
+    private String fullMessage;
+    private String currentMessage = "";
+    private Timer animationTimer;
+    private int currentIndex = 0;
+    private int animationSpeed = 40;
+    private static final int MAX_LINES = 3;
+    private static final int MAX_CHARS_PER_LINE = 60;
 
     static {
         try {
-            backgroundImage = javax.imageio.ImageIO.read(new java.io.File("assets/dialogue.png"));
+            yosterFont = Font.createFont(Font.TRUETYPE_FONT, new File("assets/yoster.ttf")).deriveFont(16f);
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(yosterFont);
+        } catch (Exception e) {
+            yosterFont = new Font("Arial", Font.BOLD, 16);
+        }
+        try {
+            backgroundImage = javax.imageio.ImageIO.read(new File("assets/dialogue.png"));
         } catch (IOException e) {
-            e.printStackTrace();
             backgroundImage = null;
         }
     }
 
     public DialoguePersonnalise(String message, Runnable onClose) {
         setLayout(new BorderLayout());
-        setOpaque(true); // Rendre le panneau opaque pour qu'il soit visible
-
-        // Ajouter le message
-        JLabel labelMessage = new JLabel(message);
-        labelMessage.setHorizontalAlignment(SwingConstants.CENTER);
+        setOpaque(true);
+        setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30)); // Ajout du padding autour du panel
+        this.fullMessage = formatMessage(message);
+        labelMessage = new JTextArea(currentMessage);
+        labelMessage.setEditable(false);
+        labelMessage.setOpaque(false);
+        labelMessage.setFocusable(false);
+        labelMessage.setLineWrap(true);
+        labelMessage.setWrapStyleWord(true);
         labelMessage.setForeground(Color.BLACK);
-        labelMessage.setFont(new Font("Arial", Font.BOLD, 16));
-        try {
-            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new java.io.File("assets/yoster.ttf")).deriveFont(16f);
-            labelMessage.setFont(customFont);
-        } catch (Exception e) {
-            e.printStackTrace();
-            labelMessage.setFont(new Font("Arial", Font.BOLD, 16)); // Police par défaut en cas d'erreur
-        }
+        labelMessage.setFont(yosterFont);
+        labelMessage.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // Padding interne du texte
         add(labelMessage, BorderLayout.CENTER);
+        startTextAnimation();
 
-        // Ajouter un bouton "OK"
         JButton boutonOk = new JButton("OK");
-        boutonOk.setIcon(new ImageIcon(new ImageIcon("assets/bouton.png").getImage().getScaledInstance(100, 50, Image.SCALE_SMOOTH))); // Redimensionner l'image
-        boutonOk.setContentAreaFilled(false); // Supprimer le fond par défaut
-        boutonOk.setFocusPainted(false); // Supprimer l'effet de focus
-        boutonOk.setBorderPainted(false); // Supprimer la bordure
-        boutonOk.setHorizontalTextPosition(SwingConstants.CENTER); // Centrer le texte sur l'image
-        boutonOk.setVerticalTextPosition(SwingConstants.CENTER); // Centrer le texte verticalement
-        boutonOk.setForeground(Color.WHITE); // Définir la couleur du texte sur blanc
-        try {
-            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new java.io.File("assets/yoster.ttf")).deriveFont(16f);
-            boutonOk.setFont(customFont);
-        } catch (Exception e) {
-            e.printStackTrace();
-            boutonOk.setFont(new Font("Arial", Font.BOLD, 16)); // Police par défaut en cas d'erreur
-        }
-        boutonOk.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onClose.run(); // Appeler la méthode de fermeture
-            }
+        boutonOk.setIcon(new ImageIcon(new ImageIcon("assets/bouton.png").getImage().getScaledInstance(100, 50, Image.SCALE_SMOOTH)));
+        boutonOk.setContentAreaFilled(false);
+        boutonOk.setFocusPainted(false);
+        boutonOk.setBorderPainted(false);
+        boutonOk.setHorizontalTextPosition(SwingConstants.CENTER);
+        boutonOk.setVerticalTextPosition(SwingConstants.CENTER);
+        boutonOk.setForeground(Color.WHITE);
+        boutonOk.setFont(yosterFont);
+        boutonOk.addActionListener(e -> {
+            if (animationTimer != null && animationTimer.isRunning()) animationTimer.stop();
+            onClose.run();
         });
         JPanel panelBoutons = new JPanel();
-        panelBoutons.setOpaque(false); // Rendre le fond transparent
+        panelBoutons.setOpaque(false);
         panelBoutons.add(boutonOk);
         add(panelBoutons, BorderLayout.SOUTH);
+    }
+
+    private String formatMessage(String message) {
+        String[] words = message.split(" ");
+        StringBuilder formatted = new StringBuilder();
+        StringBuilder line = new StringBuilder();
+        int lineCount = 0;
+        for (String word : words) {
+            if (line.length() + word.length() + 1 > MAX_CHARS_PER_LINE) {
+                if (lineCount < MAX_LINES - 1) {
+                    formatted.append(line).append("\n");
+                    line = new StringBuilder(word);
+                    lineCount++;
+                } else {
+                    String truncated = line.toString();
+                    if (truncated.length() > MAX_CHARS_PER_LINE - 3) {
+                        truncated = truncated.substring(0, MAX_CHARS_PER_LINE - 3);
+                    }
+                    formatted.append(truncated).append("...");
+                    return formatted.toString();
+                }
+            } else {
+                if (line.length() > 0) line.append(" ");
+                line.append(word);
+            }
+        }
+        if (line.length() > 0 && lineCount < MAX_LINES) {
+            formatted.append(line);
+        }
+        return formatted.toString();
+    }
+
+    private void startTextAnimation() {
+        currentIndex = 0;
+        currentMessage = "";
+        animationTimer = new Timer(animationSpeed, e -> {
+            if (currentIndex < fullMessage.length()) {
+                currentMessage += fullMessage.charAt(currentIndex);
+                labelMessage.setText(currentMessage);
+                currentIndex++;
+            } else {
+                animationTimer.stop();
+            }
+        });
+        animationTimer.start();
+    }
+
+    public void setAnimationSpeed(int speedMs) {
+        this.animationSpeed = speedMs;
     }
 
     @Override
@@ -68,7 +120,7 @@ public class DialoguePersonnalise extends JPanel {
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         } else {
-            g.setColor(Color.BLACK); // Fond temporaire noir si l'image n'est pas chargée
+            g.setColor(Color.BLACK);
             g.fillRect(0, 0, getWidth(), getHeight());
         }
     }

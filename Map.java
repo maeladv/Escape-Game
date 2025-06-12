@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.List;
 
 // Ajout de l'import de la classe Objet
 // (pas besoin d'import si Objet.java est dans le même dossier et sans package)
