@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.Rectangle;
-import java.util.ArrayList;
 import java.util.List;
 import java.awt.Color;
 import java.awt.Graphics;
