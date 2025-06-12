@@ -72,7 +72,7 @@ public class Map extends JPanel {
 
         // tables
         murs.add(new Rectangle(200, 355, 35, 30));
-        murs.add(new Rectangle(600, 515, 45, 20));
+        murs.add(new Rectangle(597, 515, 45, 20));
 
         
 
