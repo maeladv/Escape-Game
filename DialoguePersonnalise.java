@@ -29,4 +29,11 @@ public class DialoguePersonnalise extends JPanel {
         panelBoutons.add(boutonOk);
         add(panelBoutons, BorderLayout.SOUTH);
     }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Image backgroundImage = Toolkit.getDefaultToolkit().getImage("assets/dialogue.png");
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+    }
 }
