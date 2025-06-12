@@ -130,6 +130,7 @@ public class Map extends JPanel {
         mursBibliotheque.add(new Rectangle(600, 515, 45, 20));
         mursParMap.add(mursBibliotheque);
 
+
         // Objets map 1 (bibliothèque)
         List<Objet> objetsBibliotheque = new ArrayList<>();
         
@@ -219,6 +220,9 @@ public class Map extends JPanel {
                     case java.awt.event.KeyEvent.VK_DOWN:
                         nextY += joueur.speed;
                         joueur.state = 3; // Mettre à jour l'état du joueur pour la direction bas
+                        break;
+                    case java.awt.event.KeyEvent.VK_SPACE:
+                        afficherDialogue("Vous avez cliqué sur la carte !");
                         break;
                 }
                 Rectangle nextPos = new Rectangle(nextX, nextY + ((2 * taille) / 3), taille, (taille / 3));
@@ -317,6 +321,22 @@ public class Map extends JPanel {
         }
     }
 
+    // Méthode pour afficher un dialogue personnalisé au-dessus de la carte
+    private void afficherDialogue(String message) {
+        final DialoguePersonnalise[] dialogueWrapper = new DialoguePersonnalise[1];
+        dialogueWrapper[0] = new DialoguePersonnalise(message, () -> {
+            remove(dialogueWrapper[0]); // Supprimer le dialogue après fermeture
+            revalidate(); // Revalider le layout après suppression
+            repaint(); // Rafraîchir l'affichage
+        });
+        DialoguePersonnalise dialogue = dialogueWrapper[0];
+        add(dialogue); // Ajouter le dialogue avant de l'utiliser
+        dialogue.setBounds((getWidth() - (getWidth() * 3 / 4)) / 2, getHeight() - getHeight() / 4 - 20, getWidth() * 3 / 4, getHeight() / 4);
+        setLayout(null); // Permet de positionner le dialogue avec des coordonnées absolues
+        revalidate(); // Revalider le layout après ajout
+        repaint(); // Rafraîchir l'affichage
+    }
+
     // Mettre à jour la position du joueur
     @Override
     protected void paintComponent(Graphics g) {
@@ -355,6 +375,8 @@ public class Map extends JPanel {
             System.out.println(message);
         }
     }
+
+    
 
 
 
