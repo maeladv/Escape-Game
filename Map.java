@@ -43,7 +43,7 @@ public class Map extends JPanel {
         murs.add(new Rectangle(380,450,48,50));
 
         //mur vertical
-        murs.add(new Rectangle(370,80,10,this.height));
+        murs.add(new Rectangle(370,90,10,this.height));
         murs.add(new Rectangle(525,275,10,this.height));
         
         // mur bas droite
@@ -61,11 +61,17 @@ public class Map extends JPanel {
         murs.add(new Rectangle(75,285,10,50));
 
         // mur haut gauche
+        murs.add(new Rectangle(0,0,190,135));
 
         // mur haut centre
+        murs.add(new Rectangle(245,90,200,50));
 
         // mur haut droite
         murs.add(new Rectangle(580,0,200,130));
+
+        // tables
+        murs.add(new Rectangle(200, 355, 35, 30));
+        murs.add(new Rectangle(600, 515, 45, 20));
 
         
 
