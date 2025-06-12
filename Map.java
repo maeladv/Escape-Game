@@ -24,7 +24,7 @@ public class Map extends JPanel {
     String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png"};
     BufferedImage mapImage; // permet de stocker l'image de la map
     ArrayList<Rectangle> murs = new ArrayList<>();
-    boolean devMode = true; // Option de développement, à désactiver en prod
+    boolean devMode = false; // Option de développement, à désactiver en prod
 
     // Liste de listes de murs, un ensemble de murs par map
     private List<List<Rectangle>> mursParMap = new ArrayList<>();
@@ -321,19 +321,18 @@ public class Map extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        //  Dessiner tous les layers de la map
         for (Layer layer : layers) {
             layer.draw(g);
         }
-        // Dessiner les murs pour debug (en couleur vive)
+        // Si le mode développeur est activé, on affiche plus d'informations
         if (devMode ) {
+            // Dessiner les murs pour debug (en couleur vive)
             g.setColor(new Color(255,255,255,50));
-        } else {
-            g.setColor(new Color(0, 0, 0, 0)); // Transparent color
-        }
-        for (Rectangle mur : murs) {
-            g.fillRect(mur.x, mur.y, mur.width, mur.height);
-        }        // Dessiner les objets interactifs en debug
-        if (devMode) {
+            for (Rectangle mur : murs) {
+                g.fillRect(mur.x, mur.y, mur.width, mur.height);
+            }
+            // Dessiner les objets interactifs en debug
             for (Objet obj : objets) {
                 // Objet actif (joueur regarde dans sa direction) : vert plus vif
                 if (obj.isActive()) {
@@ -345,13 +344,12 @@ public class Map extends JPanel {
                 g.fillRect(obj.hitbox.x, obj.hitbox.y, obj.hitbox.width, obj.hitbox.height);
             }
         }
-        // SUPPRIME : dessin du joueur hors layers
     }
 
 
 
 
-    // affichage en mode développeur
+    // affichage en mode développeur uniquement
     private void printDev(String message) {
         if (devMode) {
             System.out.println(message);
