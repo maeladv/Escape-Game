@@ -59,7 +59,7 @@ public class Main {
             
             // Ajouter des items à l'inventaire
             try {
-                Item balai = new Item("Balai", "Un balai pour nettoyer les lieux", new File("assets/joueur/droite.png"));
+                Item balai = new Item("Balai", "Un balai pour nettoyer les lieux", new File("assets/items/balai.png"));
                 inventaire.ajouterItem(balai);
                 
                 Item livre = new Item("Livre", "Un livre ancien avec des inscriptions mystérieuses", new File("assets/joueur/gauche.png"));
