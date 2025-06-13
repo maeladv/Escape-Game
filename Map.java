@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.List;
 
 // Ajout de l'import de la classe Objet
 // (pas besoin d'import si Objet.java est dans le même dossier et sans package)
@@ -20,7 +19,7 @@ public class Map extends JPanel {
     String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png"};
     BufferedImage mapImage; // permet de stocker l'image de la map
     ArrayList<Rectangle> murs = new ArrayList<>();
-    boolean devMode = false; // Option de développement, à désactiver en prod
+    boolean devMode = true; // Option de développement, à désactiver en prod
 
     // Liste de listes de murs, un ensemble de murs par map
     private List<List<Rectangle>> mursParMap = new ArrayList<>();
@@ -28,8 +27,10 @@ public class Map extends JPanel {
     private List<Layer> layers;
 
     // Système d'objets interactifs
-    private List<List<Objet>> objetsParMap = new ArrayList<>();
-    private ArrayList<Objet> objets = new ArrayList<>();
+    private List<List<Objet>> objetsParMap = new ArrayList<>(); // Liste de listes d'objets, un ensemble d'objets par map
+
+    // Système de dialogues
+    private DialogueManager dialogueManager;
 
     // Création et initialisation de la map
     public Map() {
@@ -77,7 +78,6 @@ public class Map extends JPanel {
                 setDisplayedMap(1);
                 // Met à jour les murs et objets pour la nouvelle map
                 murs = new ArrayList<>(mursParMap.get(displayedMap));
-                objets = new ArrayList<>(objetsParMap.get(displayedMap));
                 printDev("Interaction avec la porte de la map 0 ! Changement de map.");
                 repaint();
             }
@@ -129,10 +129,25 @@ public class Map extends JPanel {
 
         // Objets map 1 (bibliothèque)
         List<Objet> objetsBibliotheque = new ArrayList<>();
-        
+        // Table avec déclenchement d'une boîte de dialogue au clic sur A
         objetsBibliotheque.add(new Objet(
-            new Rectangle(600, 515, 45,20),
-            () -> printDev("Collision avec un objet de la bibliothèque !")
+            new Rectangle(600, 510, 50, 20),
+            () -> dialogueManager.afficherDialogue("Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.", "OK", () -> joueur.canMove = true)
+        ));
+        // Première Bibliothèque
+        objetsBibliotheque.add(new Objet(
+            new Rectangle(70, 480, 50, 20),
+            () -> {
+                String[] messages = {
+                    "Ah! Il semblerait que l'on puisse interagir avec ces bibliotheques.",
+                    "Ce vieux batiment est donc une bibliotheque.",
+                    "Elle me semble très ancienne et poussiereuse. Certains murs tombent meme en ruines !",
+                    "On dirait qu'elle n'a pas ete utilisee depuis des annees.",
+                    "Peut-etre que quelqu'un a laisse un message ici ?",
+                    "Il y a des livres sur les etageres, mais certaines sont encore trop poussiereuses pour etre ouvertes."
+                };
+                dialogueManager.afficherScript(messages, "Suivant", () -> joueur.canMove = true);
+        }
         ));
         objetsParMap.add(objetsBibliotheque);
 
@@ -141,7 +156,6 @@ public class Map extends JPanel {
         // On initialise la liste de murs courante
         murs = new ArrayList<>(mursParMap.get(displayedMap));
         // On initialise la liste d'objets courante
-        objets = new ArrayList<>(objetsParMap.get(displayedMap));
 
         layers = new ArrayList<>();
 
@@ -218,7 +232,7 @@ public class Map extends JPanel {
                         joueur.state = 3; // Mettre à jour l'état du joueur pour la direction bas
                         break;
                     case java.awt.event.KeyEvent.VK_SPACE:
-                        afficherDialogue("Vous avez cliqué sur la carte !");
+                        dialogueManager.afficherDialogue("Vous avez cliqué sur la carte !", "OK", () -> joueur.canMove = true);
                         break;
                 }
                 Rectangle nextPos = new Rectangle(nextX, nextY + ((2 * taille) / 3), taille, (taille / 3));
@@ -248,7 +262,7 @@ public class Map extends JPanel {
                 // On ajoute seulement 10 pixels de marge au lieu de 20
                 Rectangle zoneInteraction = new Rectangle(joueur.x - 5, joueur.y - 5, taille + 10, taille + 10);
                 
-                for (Objet obj : objets) {
+                for (Objet obj : objetsParMap.get(displayedMap)) {
                     // Vérifier si le joueur est proche de l'objet
                     if (zoneInteraction.intersects(obj.hitbox)) {// Vérifier si le joueur regarde dans la direction de l'objet
                         boolean regardeBonneDirection = false;
@@ -292,6 +306,15 @@ public class Map extends JPanel {
                         obj.setActive(false);
                     }
                 }
+                // Test de collision avec les objets interactifs
+                Rectangle joueurBox = new Rectangle(joueur.x, joueur.y, taille, taille);
+                for (Objet obj : objetsParMap.get(displayedMap)) {
+                    if (joueurBox.intersects(obj.hitbox)) {
+                        if (e.getKeyCode() == java.awt.event.KeyEvent.VK_A) {
+                            obj.trigger();
+                        }
+                    }
+                }
                 repaint();
             }
         });
@@ -306,6 +329,25 @@ public class Map extends JPanel {
                 }
             }
         });
+        
+        // Initialisation du DialogueManager
+        dialogueManager = new DialogueManager(this);
+
+        // Script d'introduction (exemple)
+        if (displayedMap == 0) {
+            String[] introScript = {
+                "Bienvenue dans Escape From The Biblioteca !", 
+                "Que voit-on au loin ? Une coline ? Un vieux village ?",
+                "Je ne sais pas, cette foret est si sombre et si dense...",
+                "Et que voici par ici ? Un vieux batiment ? Peut-etre un chateau abandonne ?",
+                "Enfin, c'est etrange, il n'y a pas un bruit et des torches sont encore allumees !",
+                "On pourrait croire que quelqu'un vit encore ici...",
+                "Cette foret ne m'inspire pas confiance mais... le temps semble s'y etre fige.",
+                "La nuit tombe, je n'ai d'autre choix que d'entrer dans ce batiment.",
+            };
+            // Appeler le script après l'initialisation complète de la Map
+            SwingUtilities.invokeLater(() -> dialogueManager.afficherScript(introScript, "Suivant", () -> joueur.canMove = true));
+        }
     }
 
     // Méthode pour déplacer le joueur aux coordonnées de la souris
@@ -314,22 +356,6 @@ public class Map extends JPanel {
             joueur.setPosition(mouseX - 20, mouseY - 20); // Centrer le joueur sur le clic
             repaint();
         }
-    }
-
-    // Méthode pour afficher un dialogue personnalisé au-dessus de la carte
-    private void afficherDialogue(String message) {
-        final DialoguePersonnalise[] dialogueWrapper = new DialoguePersonnalise[1];
-        dialogueWrapper[0] = new DialoguePersonnalise(message, () -> {
-            remove(dialogueWrapper[0]); // Supprimer le dialogue après fermeture
-            revalidate(); // Revalider le layout après suppression
-            repaint(); // Rafraîchir l'affichage
-        });
-        DialoguePersonnalise dialogue = dialogueWrapper[0];
-        add(dialogue); // Ajouter le dialogue avant de l'utiliser
-        dialogue.setBounds((getWidth() - (getWidth() * 3 / 4)) / 2, getHeight() - getHeight() / 4 - 20, getWidth() * 3 / 4, getHeight() / 4);
-        setLayout(null); // Permet de positionner le dialogue avec des coordonnées absolues
-        revalidate(); // Revalider le layout après ajout
-        repaint(); // Rafraîchir l'affichage
     }
 
     // Mettre à jour la position du joueur
@@ -348,7 +374,7 @@ public class Map extends JPanel {
                 g.fillRect(mur.x, mur.y, mur.width, mur.height);
             }
             // Dessiner les objets interactifs en debug
-            for (Objet obj : objets) {
+            for (Objet obj : objetsParMap.get(displayedMap)) {
                 // Objet actif (joueur regarde dans sa direction) : vert plus vif
                 if (obj.isActive()) {
                     g.setColor(new Color(0, 255, 0, 160));
