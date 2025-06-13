@@ -28,4 +28,16 @@ public class Item {
     public File getImageFile() {
         return imageFile;
     }
+
+    public void setName(String name) { 
+        this.name = name; 
+    }
+    
+    public void setDescription(String description) { 
+        this.description = description; 
+    }
+    
+    public void setImageFile(File imageFile) { 
+        this.imageFile = imageFile; 
+    }
 }

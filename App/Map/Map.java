@@ -18,15 +18,15 @@ import java.util.List;
 // (pas besoin d'import si Objet.java est dans le même dossier et sans package)
 
 public class Map extends JPanel {
-    int width;
-    int height;
-    Joueur joueur;
-    int displayedMap = 0; // Indice de la map affichée, utile si on veut changer de map
-    String[] mapPath = {"assets/maps/intro/map.png","assets/maps/library/map.png"};
-    String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png"};
-    BufferedImage mapImage; // permet de stocker l'image de la map
-    ArrayList<Rectangle> murs = new ArrayList<>();
-    boolean devMode = true; // Option de développement, à désactiver en prod
+    private int width;
+    private int height;
+    private Joueur joueur;
+    private int displayedMap = 0; // Indice de la map affichée, utile si on veut changer de map
+    private String[] mapPath = {"assets/maps/intro/map.png","assets/maps/library/map.png"};
+    private String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png"};
+    private BufferedImage mapImage; // permet de stocker l'image de la map
+    private ArrayList<Rectangle> murs = new ArrayList<>();
+    private boolean devMode = true; // Option de développement, à désactiver en prod
 
     // Liste de listes de murs, un ensemble de murs par map
     private List<List<Rectangle>> mursParMap = new ArrayList<>();
@@ -139,7 +139,7 @@ public class Map extends JPanel {
         // Table avec déclenchement d'une boîte de dialogue au clic sur A
         objetsBibliotheque.add(new Objet(
             new Rectangle(600, 510, 50, 20),
-            () -> dialogueManager.afficherDialogue("Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.", "OK", () -> joueur.canMove = true)
+            () -> dialogueManager.afficherDialogue("Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.", "OK", () -> joueur.setCanMove(true))
         ));
         // Première Bibliothèque
         objetsBibliotheque.add(new Objet(
@@ -153,7 +153,7 @@ public class Map extends JPanel {
                     "Peut-etre que quelqu'un a laisse un message ici ?",
                     "Il y a des livres sur les etageres, mais certaines sont encore trop poussiereuses pour etre ouvertes."
                 };
-                dialogueManager.afficherScript(messages, "Suivant", () -> joueur.canMove = true);
+                dialogueManager.afficherScript(messages, "Suivant", () -> joueur.setCanMove(true));
         }
         ));
         objetsParMap.add(objetsBibliotheque);
@@ -218,28 +218,28 @@ public class Map extends JPanel {
         addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
             public void keyPressed(java.awt.event.KeyEvent e) {
-                int nextX = joueur.x;
-                int nextY = joueur.y;
+                int nextX = joueur.getX();
+                int nextY = joueur.getY();
                 int taille = 40;
                 switch (e.getKeyCode()) {
                     case java.awt.event.KeyEvent.VK_LEFT:
-                        nextX -= joueur.speed;
-                        joueur.state = 0; // Mettre à jour l'état du joueur pour la direction gauche
+                        nextX -= joueur.getSpeed();
+                        joueur.setState(0); // Mettre à jour l'état du joueur pour la direction gauche
                         break;
                     case java.awt.event.KeyEvent.VK_RIGHT:
-                        nextX += joueur.speed;
-                        joueur.state = 1; // Mettre à jour l'état du joueur pour la direction droite
+                        nextX += joueur.getSpeed();
+                        joueur.setState(1); // Mettre à jour l'état du joueur pour la direction droite
                         break;
                     case java.awt.event.KeyEvent.VK_UP:
-                        nextY -= joueur.speed;
-                        joueur.state = 2; // Mettre à jour l'état du joueur pour la direction haut
+                        nextY -= joueur.getSpeed();
+                        joueur.setState(2); // Mettre à jour l'état du joueur pour la direction haut
                         break;
                     case java.awt.event.KeyEvent.VK_DOWN:
-                        nextY += joueur.speed;
-                        joueur.state = 3; // Mettre à jour l'état du joueur pour la direction bas
+                        nextY += joueur.getSpeed();
+                        joueur.setState(3); // Mettre à jour l'état du joueur pour la direction bas
                         break;
                     case java.awt.event.KeyEvent.VK_SPACE:
-                        dialogueManager.afficherDialogue("Vous avez cliqué sur la carte !", "OK", () -> joueur.canMove = true);
+                        dialogueManager.afficherDialogue("Vous avez cliqué sur la carte !", "OK", () -> joueur.setCanMove(true));
                         break;
                 }
                 Rectangle nextPos = new Rectangle(nextX, nextY + ((2 * taille) / 3), taille, (taille / 3));
@@ -264,59 +264,44 @@ public class Map extends JPanel {
                         case java.awt.event.KeyEvent.VK_DOWN:
                             joueur.deplacerBas();
                             break;
-                    }                }                // Test de proximité avec les objets interactifs
-                // Zone de proximité réduite - le joueur doit être collé à l'objet
-                // On ajoute seulement 10 pixels de marge au lieu de 20
-                Rectangle zoneInteraction = new Rectangle(joueur.x - 5, joueur.y - 5, taille + 10, taille + 10);
-                
+                    }
+                }
+                Rectangle zoneInteraction = new Rectangle(joueur.getX() - 5, joueur.getY() - 5, taille + 10, taille + 10);
                 for (Objet obj : objetsParMap.get(displayedMap)) {
-                    // Vérifier si le joueur est proche de l'objet
-                    if (zoneInteraction.intersects(obj.hitbox)) {// Vérifier si le joueur regarde dans la direction de l'objet
+                    if (zoneInteraction.intersects(obj.getHitbox())) {
                         boolean regardeBonneDirection = false;
-                        
-                        // Calculer la position relative de l'objet par rapport au joueur
-                        int centreObjetX = obj.hitbox.x + obj.hitbox.width / 2;
-                        int centreObjetY = obj.hitbox.y + obj.hitbox.height / 2;
-                        int centreJoueurX = joueur.x + taille / 2;
-                        int centreJoueurY = joueur.y + taille / 2;
-                        
-                        // Déterminer si le joueur regarde dans la direction de l'objet
-                        // État 0: gauche, 1: droite, 2: haut, 3: bas
-                        switch (joueur.state) {
-                            case 0: // Gauche
+                        int centreObjetX = obj.getHitbox().x + obj.getHitbox().width / 2;
+                        int centreObjetY = obj.getHitbox().y + obj.getHitbox().height / 2;
+                        int centreJoueurX = joueur.getX() + taille / 2;
+                        int centreJoueurY = joueur.getY() + taille / 2;
+                        switch (joueur.getState()) {
+                            case 0:
                                 regardeBonneDirection = centreObjetX < centreJoueurX;
                                 break;
-                            case 1: // Droite
+                            case 1:
                                 regardeBonneDirection = centreObjetX > centreJoueurX;
                                 break;
-                            case 2: // Haut
+                            case 2:
                                 regardeBonneDirection = centreObjetY < centreJoueurY;
                                 break;
-                            case 3: // Bas
+                            case 3:
                                 regardeBonneDirection = centreObjetY > centreJoueurY;
                                 break;
                         }
-                          // Marquer l'objet comme actif s'il est dans la bonne direction
                         obj.setActive(regardeBonneDirection);
-                        
-                        // Afficher un message d'aide en mode développement
                         if (devMode && regardeBonneDirection) {
                             printDev("Objet interactif à proximité immédiate. Appuyez sur 'A' pour interagir.");
                         }
-                        
-                        // Si le joueur appuie sur 'a' et regarde dans la bonne direction, déclencher l'action
                         if (e.getKeyCode() == java.awt.event.KeyEvent.VK_A && regardeBonneDirection) {
                             obj.trigger();
                         }
                     } else {
-                        // Si le joueur n'est pas à proximité, l'objet n'est pas actif
                         obj.setActive(false);
                     }
                 }
-                // Test de collision avec les objets interactifs
-                Rectangle joueurBox = new Rectangle(joueur.x, joueur.y, taille, taille);
+                Rectangle joueurBox = new Rectangle(joueur.getX(), joueur.getY(), taille, taille);
                 for (Objet obj : objetsParMap.get(displayedMap)) {
-                    if (joueurBox.intersects(obj.hitbox)) {
+                    if (joueurBox.intersects(obj.getHitbox())) {
                         if (e.getKeyCode() == java.awt.event.KeyEvent.VK_A) {
                             obj.trigger();
                         }
@@ -353,7 +338,7 @@ public class Map extends JPanel {
                 "La nuit tombe, je n'ai d'autre choix que d'entrer dans ce batiment.",
             };
             // Appeler le script après l'initialisation complète de la Map
-            SwingUtilities.invokeLater(() -> dialogueManager.afficherScript(introScript, "Suivant", () -> joueur.canMove = true));
+            SwingUtilities.invokeLater(() -> dialogueManager.afficherScript(introScript, "Suivant", () -> joueur.setCanMove(true)));
         }
     }
 
@@ -389,7 +374,7 @@ public class Map extends JPanel {
                     // Objet inactif : vert plus transparent
                     g.setColor(new Color(0, 255, 0, 80));
                 }
-                g.fillRect(obj.hitbox.x, obj.hitbox.y, obj.hitbox.width, obj.hitbox.height);
+                g.fillRect(obj.getHitbox().x, obj.getHitbox().y, obj.getHitbox().width, obj.getHitbox().height);
             }
         }
     }
@@ -408,39 +393,45 @@ public class Map extends JPanel {
 
 
 
-    // getteurs 
-    public int getWidth() {
-        return width;
-    }
-    public int getHeight() {
-        return height;
-    }    // setteurs
+    // Getters et setters
+    public int getWidthValue() { return width; }
+    public void setWidthValue(int width) { this.width = width; }
+    public int getHeightValue() { return height; }
+    public void setHeightValue(int height) { this.height = height; }
+    public Joueur getJoueur() { return joueur; }
+    public void setJoueur(Joueur joueur) { this.joueur = joueur; }
+    public int getDisplayedMap() { return displayedMap; }
+    public String[] getMapPath() { return mapPath; }
+    public void setMapPath(String[] mapPath) { this.mapPath = mapPath; }
+    public String[] getSecondLayerPath() { return secondLayerPath; }
+    public void setSecondLayerPath(String[] secondLayerPath) { this.secondLayerPath = secondLayerPath; }
+    public BufferedImage getMapImage() { return mapImage; }
+    public void setMapImage(BufferedImage mapImage) { this.mapImage = mapImage; }
+    public ArrayList<Rectangle> getMurs() { return murs; }
+    public void setMurs(ArrayList<Rectangle> murs) { this.murs = murs; }
+    public boolean isDevMode() { return devMode; }
+    public void setDevMode(boolean devMode) { this.devMode = devMode; }
+    public List<List<Rectangle>> getMursParMap() { return mursParMap; }
+    public void setMursParMap(List<List<Rectangle>> mursParMap) { this.mursParMap = mursParMap; }
+    public List<Layer> getLayers() { return layers; }
+    public void setLayers(List<Layer> layers) { this.layers = layers; }
+    public List<List<Objet>> getObjetsParMap() { return objetsParMap; }
+    public void setObjetsParMap(List<List<Objet>> objetsParMap) { this.objetsParMap = objetsParMap; }
+    public DialogueManager getDialogueManager() { return dialogueManager; }
+    public void setDialogueManager(DialogueManager dialogueManager) { this.dialogueManager = dialogueManager; }
+
+    // setteurs
     // displayedMap
     void setDisplayedMap(int displayedMap) {
         this.displayedMap = displayedMap;
         // Charger la nouvelle image de la map
         try {
             mapImage = ImageIO.read(new File(mapPath[displayedMap]));
-            // Mettre à jour aussi l'image de la couche supérieure
-            BufferedImage map2Image = ImageIO.read(new File(secondLayerPath[displayedMap]));
-            // Mettre à jour finalMap2Images dans topLayer
-            final BufferedImage[] finalMap2Images = new BufferedImage[secondLayerPath.length];
-            finalMap2Images[displayedMap] = map2Image;
-            // Recréer topLayer
-            layers.get(2).clear(); // On vide la couche supérieure
-            layers.get(2).addElement(new Drawable() {
-                @Override
-                public void draw(Graphics g) {
-                    BufferedImage img = finalMap2Images[displayedMap];
-                    if (img != null) {
-                        g.drawImage(img, 0, 0, width, height, null);
-                    }
-                }
-            });
-            joueur.setPosition(50, 540);
         } catch (IOException e) {
             e.printStackTrace();
             printDev("Erreur lors du chargement de l'image de la map : " + e.getMessage());
         }
+        murs = new ArrayList<>(mursParMap.get(displayedMap));
+        repaint();
     }
 }

@@ -144,8 +144,17 @@ public class InventaireUI extends JPanel {
         repaint();
     }
     
-    // Méthode pour définir le DialogueManager
-    public void setDialogueManager(DialogueManager dialogueManager) {
-        this.dialogueManager = dialogueManager;
-    }
+    // Getters et Setters pour chaque attribut d'instance
+    public Inventaire getInventaire() { return inventaire; }
+    public void setInventaire(Inventaire inventaire) { this.inventaire = inventaire; }
+    public int getSlotSize() { return slotSize; }
+    public void setSlotSize(int slotSize) { this.slotSize = slotSize; }
+    public int getPadding() { return padding; }
+    public void setPadding(int padding) { this.padding = padding; }
+    public int getRows() { return rows; }
+    public void setRows(int rows) { this.rows = rows; }
+    public BufferedImage getDefaultImage() { return defaultImage; }
+    public void setDefaultImage(BufferedImage defaultImage) { this.defaultImage = defaultImage; }
+    public DialogueManager getDialogueManager() { return dialogueManager; }
+    public void setDialogueManager(DialogueManager dialogueManager) { this.dialogueManager = dialogueManager; }
 }
