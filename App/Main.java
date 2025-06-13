@@ -1,5 +1,12 @@
 package App;
 import javax.swing.*;
+
+import App.Dialogue.DialogueManager;
+import App.Inventaire.Inventaire;
+import App.Inventaire.InventaireUI;
+import App.Inventaire.Item;
+import App.Map.Map;
+
 import java.awt.*;
 import java.io.File;
 

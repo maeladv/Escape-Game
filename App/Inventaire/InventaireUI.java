@@ -1,5 +1,8 @@
-package App;
+package App.Inventaire;
 import javax.swing.*;
+
+import App.Dialogue.DialogueManager;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;

@@ -1,5 +1,11 @@
-package App;
+package App.Map;
 import javax.swing.*;
+
+import App.Dialogue.DialogueManager;
+import App.Joueur.Joueur;
+import App.Objets.Objet;
+import App.Utils.Drawable;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;

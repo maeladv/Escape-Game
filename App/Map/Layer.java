@@ -1,6 +1,8 @@
-package App;
+package App.Map;
 import java.awt.Graphics;
 import java.util.ArrayList;
+
+import App.Utils.Drawable;
 
 public class Layer {
     private ArrayList<Drawable> elements;
