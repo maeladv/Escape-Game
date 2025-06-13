@@ -53,4 +53,8 @@ public class Inventaire {
     public boolean contientItem(Item item) {
         return items.contains(item);
     }
+
+    public void setItems(ArrayList<Item> items) { this.items = items; }
+    public int getCapacity() { return capacity; }
+    public void setCapacity(int capacity) { this.capacity = capacity; }
 }

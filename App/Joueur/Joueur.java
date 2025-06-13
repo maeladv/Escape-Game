@@ -6,14 +6,14 @@ import java.io.File;
 import java.io.IOException;
 
 public class Joueur {
-    int x, y; // Position du joueur
-    String nom;
-    int state; // 0 : gauche, 1 : droite, 2 : haut, 3 : bas
-    int speed;
-    boolean canMove = true; // Indique si le joueur peut se déplacer
+    private int x, y; // Position du joueur
+    private String nom;
+    private int state; // 0 : gauche, 1 : droite, 2 : haut, 3 : bas
+    private int speed;
+    private boolean canMove = true; // Indique si le joueur peut se déplacer
     // Ordre : gauche, droite, haut, bas
-    String[] image_paths = {"assets/joueur/gauche.png", "assets/joueur/droite.png", "assets/joueur/haut.png", "assets/joueur/bas.png"};
-    BufferedImage[] joueurImages = new BufferedImage[4];
+    private final String[] image_paths = {"assets/joueur/gauche.png", "assets/joueur/droite.png", "assets/joueur/haut.png", "assets/joueur/bas.png"};
+    private BufferedImage[] joueurImages = new BufferedImage[4];
 
     public Joueur(String nom, int x, int y, int speed) {
         this.nom = nom;
@@ -56,4 +56,20 @@ public class Joueur {
         this.x = x;
         this.y = y;
     }
+
+    // Getters et setters
+    public int getX() { return x; }
+    public void setX(int x) { this.x = x; }
+    public int getY() { return y; }
+    public void setY(int y) { this.y = y; }
+    public String getNom() { return nom; }
+    public void setNom(String nom) { this.nom = nom; }
+    public int getState() { return state; }
+    public void setState(int state) { this.state = state; }
+    public int getSpeed() { return speed; }
+    public void setSpeed(int speed) { this.speed = speed; }
+    public boolean isCanMove() { return canMove; }
+    public void setCanMove(boolean canMove) { this.canMove = canMove; }
+    public BufferedImage[] getJoueurImages() { return joueurImages; }
+    public String[] getImagePaths() { return image_paths; }
 }

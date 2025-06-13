@@ -24,4 +24,12 @@ public class Layer {
             element.draw(g);
         }
     }
+
+    public ArrayList<Drawable> getElements() {
+        return elements;
+    }
+
+    public void setElements(ArrayList<Drawable> elements) {
+        this.elements = elements;
+    }
 }
