@@ -29,6 +29,9 @@ public class Map extends JPanel {
     // Système d'objets interactifs
     private List<List<Objet>> objetsParMap = new ArrayList<>(); // Liste de listes d'objets, un ensemble d'objets par map
 
+    // Système de dialogues
+    private DialogueManager dialogueManager;
+
     // Création et initialisation de la map
     public Map() {
         this.width = 800;
@@ -129,7 +132,7 @@ public class Map extends JPanel {
         // Table avec déclenchement d'une boîte de dialogue au clic sur A
         objetsBibliotheque.add(new Objet(
             new Rectangle(600, 510, 50, 20),
-            () -> afficherDialogue("Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.")
+            () -> dialogueManager.afficherDialogue("Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.", "OK", () -> joueur.canMove = true)
         ));
         // Première Bibliothèque
         objetsBibliotheque.add(new Objet(
@@ -143,7 +146,7 @@ public class Map extends JPanel {
                     "Peut-etre que quelqu'un a laisse un message ici ?",
                     "Il y a des livres sur les etageres, mais certaines sont encore trop poussiereuses pour etre ouvertes."
                 };
-                afficherScript(messages, "Suivant");
+                dialogueManager.afficherScript(messages, "Suivant", () -> joueur.canMove = true);
         }
         ));
         objetsParMap.add(objetsBibliotheque);
@@ -229,7 +232,7 @@ public class Map extends JPanel {
                         joueur.state = 3; // Mettre à jour l'état du joueur pour la direction bas
                         break;
                     case java.awt.event.KeyEvent.VK_SPACE:
-                        afficherDialogue("Vous avez cliqué sur la carte !");
+                        dialogueManager.afficherDialogue("Vous avez cliqué sur la carte !", "OK", () -> joueur.canMove = true);
                         break;
                 }
                 Rectangle nextPos = new Rectangle(nextX, nextY + ((2 * taille) / 3), taille, (taille / 3));
@@ -327,6 +330,9 @@ public class Map extends JPanel {
             }
         });
         
+        // Initialisation du DialogueManager
+        dialogueManager = new DialogueManager(this);
+
         // Script d'introduction (exemple)
         if (displayedMap == 0) {
             String[] introScript = {
@@ -339,7 +345,8 @@ public class Map extends JPanel {
                 "Cette foret ne m'inspire pas confiance mais... le temps semble s'y etre fige.",
                 "La nuit tombe, je n'ai d'autre choix que d'entrer dans ce batiment.",
             };
-            afficherScript(introScript, "Suivant");
+            // Appeler le script après l'initialisation complète de la Map
+            SwingUtilities.invokeLater(() -> dialogueManager.afficherScript(introScript, "Suivant", () -> joueur.canMove = true));
         }
     }
 
@@ -349,59 +356,6 @@ public class Map extends JPanel {
             joueur.setPosition(mouseX - 20, mouseY - 20); // Centrer le joueur sur le clic
             repaint();
         }
-    }
-
-    // Méthode pour afficher une séquence de dialogues (script)
-    private void afficherScript(String[] messages, String boutonTexte) {
-        if (messages == null || messages.length == 0) return;
-        joueur.canMove = false;
-        final int[] index = {0};
-        Runnable nextDialogue = new Runnable() {
-            @Override
-            public void run() {
-                if (index[0] < messages.length - 1) {
-                    index[0]++;
-                    afficherDialogue(messages[index[0]], boutonTexte, this);
-                } else {
-                    joueur.canMove = true;
-                }
-            }
-        };
-        afficherDialogue(messages[0], boutonTexte, nextDialogue);
-    }
-
-    // Surcharge de la méthode afficherDialogue pour accepter le texte du bouton
-    private void afficherDialogue(String message, String boutonTexte, Runnable onClose) {
-        joueur.canMove = false;
-        final DialoguePersonnalise[] dialogueWrapper = new DialoguePersonnalise[1];
-        dialogueWrapper[0] = new DialoguePersonnalise(message, boutonTexte, () -> {
-            remove(dialogueWrapper[0]);
-            onClose.run();
-            revalidate();
-            repaint();
-        });
-        DialoguePersonnalise dialogue = dialogueWrapper[0];
-        add(dialogue);
-        dialogue.setBounds((getWidth() - (getWidth() * 3 / 4)) / 2, getHeight() - getHeight() / 4 - 20, getWidth() * 3 / 4, getHeight() / 4);
-        setLayout(null);
-        revalidate();
-        repaint();
-    }
-
-    // Méthode pour afficher un dialogue personnalisé au-dessus de la carte
-    private void afficherDialogue(String message) {
-        afficherDialogue(message, "OK", () -> {
-            // Correction : ne pas retirer le dernier composant à l'aveugle
-            for (Component comp : getComponents()) {
-                if (comp instanceof DialoguePersonnalise) {
-                    remove(comp);
-                    break;
-                }
-            }
-            joueur.canMove = true;
-            revalidate();
-            repaint();
-        });
     }
 
     // Mettre à jour la position du joueur
