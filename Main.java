@@ -1,5 +1,5 @@
 import javax.swing.*;
-    import java.awt.*;
+import java.awt.*;
 import java.io.File;
 
 public class Main {
@@ -16,17 +16,21 @@ public class Main {
 
         // Créer et initialiser l'inventaire
         inventaire = new Inventaire(5);
-        
         // Créer l'interface de l'inventaire
         inventaireUI = new InventaireUI(inventaire);
         
+        // Positionner l'inventaire en haut à gauche
+        inventaireUI.setBounds(10, 10, 400, 100);
+        
         // Créer et ajouter la map
         map = new Map();
-        
-        // Utiliser un BorderLayout pour organiser les composants
+          // Utiliser un BorderLayout pour organiser les composants
         window.setLayout(new BorderLayout());
         window.add(map, BorderLayout.CENTER);
-        window.add(inventaireUI, BorderLayout.SOUTH);
+        
+        // Ajouter l'inventaire à la carte en tant que composant flottant
+        map.setLayout(new BorderLayout());
+        map.add(inventaireUI, BorderLayout.NORTH);
         
         window.pack();
         // Empêcher la redimension de la fenêtre

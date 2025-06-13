@@ -25,11 +25,12 @@ public class InventaireUI extends JPanel {
         
         // Définir la taille préférée du panneau d'inventaire
         int width = cols * (slotSize + padding) + padding;
-        int height = rows * (slotSize + padding) + padding;
+        // Augmenter légèrement la hauteur pour le texte en dessous des slots
+        int height = rows * (slotSize + padding) + padding + 10;
         setPreferredSize(new Dimension(width, height));
         
-        // Définir un fond semi-transparent
-        setBackground(new Color(50, 50, 50, 180));
+        // Rendre le panneau transparent
+        setOpaque(false);
         
         // Ajouter des écouteurs de souris pour interagir avec les items
         addMouseListener(new java.awt.event.MouseAdapter() {
@@ -74,11 +75,11 @@ public class InventaireUI extends JPanel {
             int y = padding + row * (slotSize + padding);
             
             // Dessiner le fond de l'emplacement
-            g.setColor(new Color(70, 70, 70, 200));
+            g.setColor(new Color(70, 70, 70, 150)); // Fond semi-transparent
             g.fillRect(x, y, slotSize, slotSize);
             
             // Dessiner la bordure de l'emplacement
-            g.setColor(new Color(120, 120, 120));
+            g.setColor(new Color(220, 220, 220, 200)); // Bordure plus claire et semi-transparente
             g.drawRect(x, y, slotSize, slotSize);
             
             // Récupérer l'item pour cet emplacement
@@ -121,7 +122,15 @@ public class InventaireUI extends JPanel {
                 textWidth = fm.stringWidth(name);
             }
             
-            g.drawString(name, x + (slotSize - textWidth) / 2, y + slotSize + 15);
+            // Dessiner un léger fond semi-transparent sous le texte pour améliorer la lisibilité
+            int textY = y + slotSize + 20;
+            int textHeight = fm.getHeight();
+            
+            // Restaurer la couleur du texte
+            g.setColor(Color.WHITE);
+            
+            // Positionnement vertical ajusté pour éviter que le texte soit coupé
+            g.drawString(name, x + (slotSize - textWidth) / 2, textY);
         }
     }
     
