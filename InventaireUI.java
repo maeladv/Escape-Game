@@ -1,4 +1,4 @@
-    import javax.swing.*;
+import javax.swing.*;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,6 +11,7 @@ public class InventaireUI extends JPanel {
     private int padding = 10;  // Espacement entre les emplacements
     private int rows = 1;      // Nombre de lignes dans l'inventaire
     private BufferedImage defaultImage; // Image par défaut si l'image de l'item n'est pas disponible
+    private DialogueManager dialogueManager;
     
     public InventaireUI(Inventaire inventaire) {
         this.inventaire = inventaire;
@@ -48,11 +49,10 @@ public class InventaireUI extends JPanel {
                 ArrayList<Item> items = inventaire.getItems();
                 if (index >= 0 && index < items.size()) {
                     Item selectedItem = items.get(index);
-                    JOptionPane.showMessageDialog(
-                        null,
-                        selectedItem.getDescription(),
-                        selectedItem.getNom(),
-                        JOptionPane.INFORMATION_MESSAGE
+                    dialogueManager.afficherDialogue(
+                        selectedItem.getNom()+ " : "  + selectedItem.getDescription(),
+                        "OK",  // Texte du bouton
+                        null   // Pas d'action spécifique à exécuter à la fermeture
                     );
                 }
             }
@@ -138,5 +138,10 @@ public class InventaireUI extends JPanel {
     public void updateInventaire(Inventaire inventaire) {
         this.inventaire = inventaire;
         repaint();
+    }
+    
+    // Méthode pour définir le DialogueManager
+    public void setDialogueManager(DialogueManager dialogueManager) {
+        this.dialogueManager = dialogueManager;
     }
 }
