@@ -21,10 +21,14 @@ public class Main {
         
         // Positionner l'inventaire en haut à gauche
         inventaireUI.setBounds(10, 10, 400, 100);
-        
         // Créer et ajouter la map
         map = new Map();
-          // Utiliser un BorderLayout pour organiser les composants
+        
+        // Créer le DialogueManager et le lier à l'inventaireUI
+        DialogueManager dialogueManager = new DialogueManager(map);
+        inventaireUI.setDialogueManager(dialogueManager);
+          
+        // Utiliser un BorderLayout pour organiser les composants
         window.setLayout(new BorderLayout());
         window.add(map, BorderLayout.CENTER);
         
