@@ -1,3 +1,4 @@
+package App;
 import java.awt.Rectangle;
 
 public class Objet {
