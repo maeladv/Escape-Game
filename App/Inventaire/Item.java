@@ -1,4 +1,4 @@
-package App;
+package App.Inventaire;
 import java.io.File;
 
 public class Item {

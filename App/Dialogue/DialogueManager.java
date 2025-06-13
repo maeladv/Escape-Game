@@ -1,4 +1,4 @@
-package App;
+package App.Dialogue;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
