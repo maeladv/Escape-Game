@@ -86,6 +86,8 @@ public class Map extends JPanel {
                 // Met à jour les murs et objets pour la nouvelle map
                 murs = new ArrayList<>(mursParMap.get(displayedMap));
                 printDev("Interaction avec la porte de la map 0 ! Changement de map.");
+                joueur.setPosition(50, 530);
+                joueur.setState(1);
                 repaint();
             }
         ));
