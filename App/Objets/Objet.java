@@ -2,12 +2,14 @@ package App.Objets;
 import java.awt.Rectangle;
 
 public class Objet {
+    private String name; // Nom de l'objet
     private Rectangle hitbox;
     private Runnable onCollision; // Action à exécuter lors de la collision
     private boolean alreadyTriggered = false;
     private boolean isActive = false; // Indique si l'objet est actif (joueur regarde dans sa direction)
 
-    public Objet(Rectangle hitbox, Runnable onCollision) {
+    public Objet(String name, Rectangle hitbox, Runnable onCollision) {
+        this.name = name;
         this.hitbox = hitbox;
         this.onCollision = onCollision;
     }
@@ -32,6 +34,8 @@ public class Objet {
     }
 
     // Getters et setters
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
     public Rectangle getHitbox() { return hitbox; }
     public void setHitbox(Rectangle hitbox) { this.hitbox = hitbox; }
     public Runnable getOnCollision() { return onCollision; }
