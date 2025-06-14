@@ -72,14 +72,6 @@ public class InputHandler {
                         nextY += joueur.getSpeed();
                         joueur.setState(3); // Down
                         break;
-                    case KeyEvent.VK_SPACE:
-                        // Show dialogue when space is pressed
-                        gameController.getDialogueManager().afficherDialogue(
-                            "Vous avez cliqué sur la carte !", 
-                            "OK", 
-                            () -> joueur.setCanMove(true)
-                        );
-                        break;
                     case KeyEvent.VK_A:
                         pressedA = true;
                         break;
