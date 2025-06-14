@@ -79,7 +79,7 @@ public class GameController {
         List<Objet> objetsIntro = new ArrayList<>();
         
         // Door object that changes map when interacted with
-        objetsIntro.add(new Objet(
+        objetsIntro.add(new Objet("porte d'entrée",
             new Rectangle(540, 310, 70, 110),
             () -> {
                 changeMap(1);
@@ -134,7 +134,7 @@ public class GameController {
         List<Objet> objetsBibliotheque = new ArrayList<>();
         
         // Table with dialogue
-        objetsBibliotheque.add(new Objet(
+        objetsBibliotheque.add(new Objet("table de la bibliothèque",
             new Rectangle(600, 510, 50, 20),
             () -> dialogueManager.afficherDialogue(
                 "Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.", 
@@ -144,7 +144,7 @@ public class GameController {
         ));
         
         // Bookshelf with multi-step dialogue
-        objetsBibliotheque.add(new Objet(
+        objetsBibliotheque.add(new Objet("bibliothèque entree",
             new Rectangle(70, 480, 50, 20),
             () -> {
                 String[] messages = {
