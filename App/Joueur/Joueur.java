@@ -70,6 +70,7 @@ public class Joueur {
     public void setSpeed(int speed) { this.speed = speed; }
     public boolean isCanMove() { return canMove; }
     public void setCanMove(boolean canMove) { this.canMove = canMove; }
+    public boolean canMove() { return canMove; } // Alias pour la compatibilité
     public BufferedImage[] getJoueurImages() { return joueurImages; }
     public String[] getImagePaths() { return image_paths; }
 }
