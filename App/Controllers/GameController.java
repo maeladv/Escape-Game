@@ -202,9 +202,13 @@ public class GameController {
         };
         
         // Show the introduction script
-        javax.swing.SwingUtilities.invokeLater(() -> 
-            dialogueManager.afficherScript(introScript, "Suivant", () -> joueur.setCanMove(true))
-        );
+        // Utiliser un Timer pour s'assurer que l'interface est complètement initialisée
+        javax.swing.Timer timer = new javax.swing.Timer(500, e -> {
+            ((javax.swing.Timer)e.getSource()).stop();
+            dialogueManager.afficherScript(introScript, "Suivant", () -> joueur.setCanMove(true));
+        });
+        timer.setRepeats(false);
+        timer.start();
     }
     
     /**
