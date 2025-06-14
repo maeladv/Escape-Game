@@ -14,6 +14,7 @@ import java.awt.*;
 import java.io.File;
 
 public class Main {
+    // Variables pour les composants du jeu
     private static JFrame window;
     private static Map map;
     private static Inventaire inventaire;
@@ -21,6 +22,11 @@ public class Main {
     private static Joueur joueur;
     private static GameController gameController;
     private static InputHandler inputHandler;
+    
+    // Configuration globale du jeu (centralisée)
+    private static boolean devMode = true;
+    private static int playerSize = 40;
+    private static int interactionZoneSize = 5; // Marge autour du joueur pour les interactions
 
     private static void initialiserFenetre() {
         // Créer une fenêtre Jframe avec un titre
@@ -35,12 +41,11 @@ public class Main {
         
         // Positionner l'inventaire en haut à gauche
         inventaireUI.setBounds(10, 10, 400, 100);
-        
-        // Créer et ajouter la map
-        map = new Map();
+          // Créer et ajouter la map
+        map = new Map(devMode);
         
         // Créer le joueur
-        joueur = new Joueur("Joueur", 30, 460, 10);
+        joueur = new Joueur(30, 460, 10);
         
         // Ajouter le joueur au layer du milieu de la map
         map.addPlayerLayerElement(new Drawable() {
@@ -49,9 +54,8 @@ public class Main {
                 joueur.afficher(g);
             }
         });
-        
-        // Créer le GameController pour gérer la logique du jeu
-        gameController = new GameController(map, joueur, inventaire, inventaireUI);
+          // Créer le GameController pour gérer la logique du jeu
+        gameController = new GameController(map, joueur, inventaire, inventaireUI, devMode, playerSize, interactionZoneSize);
         
         // Créer l'InputHandler pour gérer les entrées utilisateur
         inputHandler = new InputHandler(gameController, map, joueur);

@@ -22,17 +22,23 @@ public class GameController {
     private Inventaire inventaire;
     private InventaireUI inventaireUI;
     private DialogueManager dialogueManager;
-    private boolean devMode = true;
+    private boolean devMode;
+    private int playerSize;
+    private int interactionZoneSize;
     
     private int currentMapIndex = 0;
     private List<List<Objet>> objetsParMap;
     private List<List<Rectangle>> mursParMap;
 
-    public GameController(Map map, Joueur joueur, Inventaire inventaire, InventaireUI inventaireUI) {
+    public GameController(Map map, Joueur joueur, Inventaire inventaire, InventaireUI inventaireUI, 
+                         boolean devMode, int playerSize, int interactionZoneSize) {
         this.map = map;
         this.joueur = joueur;
         this.inventaire = inventaire;
         this.inventaireUI = inventaireUI;
+        this.devMode = devMode;
+        this.playerSize = playerSize;
+        this.interactionZoneSize = interactionZoneSize;
         
         // Initialize collections
         this.objetsParMap = new ArrayList<>();
@@ -219,12 +225,12 @@ public class GameController {
      * @param pressedA True if the 'A' key is pressed
      */
     public void checkObjectInteractions(boolean pressedA) {
-        int taille = 40; // Player size
-        
         // Create interaction zone around player
         Rectangle zoneInteraction = new Rectangle(
-            joueur.getX() - 5, joueur.getY() - 5, 
-            taille + 10, taille + 10
+            joueur.getX() - interactionZoneSize, 
+            joueur.getY() - interactionZoneSize, 
+            playerSize + (interactionZoneSize * 2), 
+            playerSize + (interactionZoneSize * 2)
         );
         
         // Check all objects in the current map
@@ -234,8 +240,8 @@ public class GameController {
                 boolean regardeBonneDirection = false;
                 int centreObjetX = obj.getHitbox().x + obj.getHitbox().width / 2;
                 int centreObjetY = obj.getHitbox().y + obj.getHitbox().height / 2;
-                int centreJoueurX = joueur.getX() + taille / 2;
-                int centreJoueurY = joueur.getY() + taille / 2;
+                int centreJoueurX = joueur.getX() + playerSize / 2;
+                int centreJoueurY = joueur.getY() + playerSize / 2;
                 
                 // Check if player is facing the object
                 int diffX = centreObjetX - centreJoueurX;
@@ -278,10 +284,8 @@ public class GameController {
      * @param pressedA True if the 'A' key is pressed
      */
     public void checkDirectObjectCollisions(boolean pressedA) {
-        int taille = 40; // Player size
-        
         // Create player hitbox
-        Rectangle joueurBox = new Rectangle(joueur.getX(), joueur.getY(), taille, taille);
+        Rectangle joueurBox = new Rectangle(joueur.getX(), joueur.getY(), playerSize, playerSize);
         
         // Check all objects in the current map
         for (Objet obj : objetsParMap.get(currentMapIndex)) {

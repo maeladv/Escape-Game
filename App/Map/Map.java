@@ -17,18 +17,20 @@ import java.util.List;
  * This class has been refactored to focus primarily on display functionality,
  * with game logic moved to the GameController class.
  */
-public class Map extends JPanel {
-    private int width;
+public class Map extends JPanel {    private int width;
     private int height;
     private int displayedMap = 0; // Indice de la map affichée
     private String[] mapPath = {"assets/maps/intro/map.png","assets/maps/library/map.png"};
     private String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png"};
     private BufferedImage mapImage; // permet de stocker l'image de la map
     private ArrayList<Rectangle> murs = new ArrayList<>();
-    private boolean devMode = true; // Option de développement, à désactiver en prod
+    private boolean devMode; // Option de développement, à désactiver en prod
     
-    private List<Layer> layers;    // Création et initialisation de la map
-    public Map() {
+    private List<Layer> layers;    
+    
+    // Création et initialisation de la map
+    public Map(boolean devMode) {
+        this.devMode = devMode;
         this.width = 800;
         this.height = 600;
         
