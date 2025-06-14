@@ -9,6 +9,7 @@ import App.Inventaire.Item;
 import App.Joueur.Joueur;
 import App.Map.Map;
 import App.Utils.Drawable;
+import App.Utils.GameUtils;
 
 import java.awt.*;
 import java.io.File;
@@ -100,16 +101,15 @@ public class Main {
                 
                 Item clef = new Item("Clef", "Une clef en métal qui pourrait ouvrir une porte", new File("assets/joueur/haut.png"));
                 inventaire.ajouterItem(clef);
-                
-                // Mettre à jour l'affichage de l'inventaire
+                  // Mettre à jour l'affichage de l'inventaire
                 inventaireUI.updateInventaire(inventaire);
                 
                 // Afficher les items dans la console
                 inventaire.getItems().forEach(item -> {
-                    System.out.println("Item dans l'inventaire : " + item.getNom() + " - " + item.getDescription());
+                    GameUtils.printDev("Item dans l'inventaire : " + item.getNom() + " - " + item.getDescription(), devMode);
                 });
             } catch (Exception e) {
-                System.out.println("Erreur lors de l'initialisation des items : " + e.getMessage());
+                GameUtils.printDev("Erreur lors de l'initialisation des items : " + e.getMessage(), devMode);
                 e.printStackTrace();
             }
         });
