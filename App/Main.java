@@ -1,11 +1,14 @@
 package App;
 import javax.swing.*;
 
-import App.Dialogue.DialogueManager;
+import App.Controllers.GameController;
+import App.Controllers.InputHandler;
 import App.Inventaire.Inventaire;
 import App.Inventaire.InventaireUI;
 import App.Inventaire.Item;
+import App.Joueur.Joueur;
 import App.Map.Map;
+import App.Utils.Drawable;
 
 import java.awt.*;
 import java.io.File;
@@ -15,6 +18,9 @@ public class Main {
     private static Map map;
     private static Inventaire inventaire;
     private static InventaireUI inventaireUI;
+    private static Joueur joueur;
+    private static GameController gameController;
+    private static InputHandler inputHandler;
 
     private static void initialiserFenetre() {
         // Créer une fenêtre Jframe avec un titre
@@ -29,12 +35,26 @@ public class Main {
         
         // Positionner l'inventaire en haut à gauche
         inventaireUI.setBounds(10, 10, 400, 100);
+        
         // Créer et ajouter la map
         map = new Map();
         
-        // Créer le DialogueManager et le lier à l'inventaireUI
-        DialogueManager dialogueManager = new DialogueManager(map);
-        inventaireUI.setDialogueManager(dialogueManager);
+        // Créer le joueur
+        joueur = new Joueur("Joueur", 30, 460, 10);
+        
+        // Ajouter le joueur au layer du milieu de la map
+        map.addPlayerLayerElement(new Drawable() {
+            @Override
+            public void draw(Graphics g) {
+                joueur.afficher(g);
+            }
+        });
+        
+        // Créer le GameController pour gérer la logique du jeu
+        gameController = new GameController(map, joueur, inventaire, inventaireUI);
+        
+        // Créer l'InputHandler pour gérer les entrées utilisateur
+        inputHandler = new InputHandler(gameController, map, joueur);
           
         // Utiliser un BorderLayout pour organiser les composants
         window.setLayout(new BorderLayout());
@@ -64,6 +84,7 @@ public class Main {
         // Exécuter l'initialisation de la fenêtre dans l'EDT (Event Dispatch Thread)
         SwingUtilities.invokeLater(() -> {
             initialiserFenetre();
+
             
             // Ajouter des items à l'inventaire
             try {
