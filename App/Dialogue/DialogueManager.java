@@ -26,6 +26,9 @@ public class DialogueManager {
         parent.setLayout(null);
         parent.revalidate();
         parent.repaint();
+        
+        // S'assurer que la boîte de dialogue prend le focus pour capter les événements clavier
+        currentDialogue.requestFocusInWindow();
     }
 
     public void afficherScript(String[] messages, String boutonTexte, Runnable onAllClose) {
@@ -117,6 +120,26 @@ public class DialogueManager {
                 if (animationTimer != null && animationTimer.isRunning()) animationTimer.stop();
                 onClose.run();
             });
+            
+            // Ajouter un écouteur de clavier pour gérer la touche espace
+            setFocusable(true);
+            addKeyListener(new java.awt.event.KeyAdapter() {
+                @Override
+                public void keyPressed(java.awt.event.KeyEvent e) {
+                    if (e.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
+                        if (animationTimer != null && animationTimer.isRunning()) {
+                            // Si l'animation est en cours, l'arrêter et afficher tout le texte
+                            animationTimer.stop();
+                            currentMessage = fullMessage;
+                            labelMessage.setText(currentMessage);
+                        } else {
+                            // Sinon, fermer le dialogue
+                            onClose.run();
+                        }
+                    }
+                }
+            });
+            
             JPanel panelBoutons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
             panelBoutons.setOpaque(false);
             panelBoutons.add(boutonOk);
