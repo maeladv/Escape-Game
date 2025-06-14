@@ -34,7 +34,6 @@ public class GameController {
     private List<List<Objet>> objetsParMap;
     private List<List<Rectangle>> mursParMap;
     private List<Item> allItems; // Liste de tous les items disponibles dans le jeu
-    // private Item livre; // Item livre disponible dans la bibliothèque
 
     public GameController(Map map, Joueur joueur, Inventaire inventaire, InventaireUI inventaireUI, 
                          boolean devMode, int playerSize, int interactionZoneSize) {
@@ -93,7 +92,7 @@ public class GameController {
         
         // Door object that changes map when interacted with
         objetsIntro.add(new Objet("porte d'entrée",
-            new Rectangle(540, 310, 70, 110),
+            new Rectangle(540, 310, 70, 110), inventaire,
             () -> {
                 changeMap(1);
                 GameUtils.printDev("Interaction avec la porte de la map 0 ! Changement de map.", devMode);
@@ -158,23 +157,10 @@ public class GameController {
         // Initialize objects for map 1 (Library)
         List<Objet> objetsBibliotheque = new ArrayList<>();
         
-        // Table with dialogue
-        Objet tableBibliotheque = new Objet("table de la bibliothèque",
-            new Rectangle(600, 510, 50, 20),
-            () -> dialogueManager.afficherDialogue(
-                "Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.", 
-                "OK", 
-                () -> joueur.setCanMove(true)
-            )
-        );
-        objetsBibliotheque.add(tableBibliotheque);
-
-        Item bougie = new Item("Bougie", "Une bougie qui semble encore allumée.", new java.io.File("assets/joueur/droite.png"), tableBibliotheque);
-        allItems.add(bougie);
 
         // Bookshelf with multi-step dialogue
         Objet bibliothequeEntree = new Objet("bibliothèque entree",
-            new Rectangle(70, 480, 50, 20),
+            new Rectangle(70, 480, 50, 20), inventaire,
             () -> {
                 String[] messages = {
                     "Ah! Il semblerait que l'on puisse interagir avec ces bibliotheques.",
@@ -194,6 +180,20 @@ public class GameController {
         Item livre = new Item("Livre ancien", "Un livre poussiéreux qui semble très ancien.", new java.io.File("assets/items/balai.png"), bibliothequeEntree);
         // Ajouter l'item à la liste globale des items
         allItems.add(livre);
+
+        // Table with dialogue
+        Objet tableBibliotheque = new Objet("table de la bibliothèque",
+            new Rectangle(600, 510, 50, 20), inventaire, livre,
+            () -> dialogueManager.afficherDialogue(
+                "Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.", 
+                "OK", 
+                () -> joueur.setCanMove(true)
+            )
+        );
+        objetsBibliotheque.add(tableBibliotheque);
+
+        Item bougie = new Item("Bougie", "Une bougie qui semble encore allumée.", new java.io.File("assets/joueur/droite.png"), tableBibliotheque);
+        allItems.add(bougie);
         
         // Set initial map's walls to Map class
         map.setMurs(new ArrayList<>(mursParMap.get(currentMapIndex)));
