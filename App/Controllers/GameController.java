@@ -159,15 +159,19 @@ public class GameController {
         List<Objet> objetsBibliotheque = new ArrayList<>();
         
         // Table with dialogue
-        objetsBibliotheque.add(new Objet("table de la bibliothèque",
+        Objet tableBibliotheque = new Objet("table de la bibliothèque",
             new Rectangle(600, 510, 50, 20),
             () -> dialogueManager.afficherDialogue(
                 "Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.", 
                 "OK", 
                 () -> joueur.setCanMove(true)
             )
-        ));
-        
+        );
+        objetsBibliotheque.add(tableBibliotheque);
+
+        Item bougie = new Item("Bougie", "Une bougie qui semble encore allumée.", new java.io.File("assets/joueur/droite.png"), tableBibliotheque);
+        allItems.add(bougie);
+
         // Bookshelf with multi-step dialogue
         Objet bibliothequeEntree = new Objet("bibliothèque entree",
             new Rectangle(70, 480, 50, 20),

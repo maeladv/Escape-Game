@@ -31,7 +31,7 @@ public class InventaireUI extends JPanel {
         // Définir la taille préférée du panneau d'inventaire
         int width = cols * (slotSize + padding) + padding;
         // Augmenter légèrement la hauteur pour le texte en dessous des slots
-        int height = rows * (slotSize + padding) + padding + 10;
+        int height = rows * (slotSize + padding) + padding + 20;
         setPreferredSize(new Dimension(width, height));
         
         // Rendre le panneau transparent
