@@ -188,6 +188,11 @@ public class GameController {
                 "Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.", 
                 "OK", 
                 () -> joueur.setCanMove(true)
+            ),
+            () -> dialogueManager.afficherDialogue(
+                "Trouver le livre pour interagir. Appuyez sur OK pour continuer.", 
+                "OK", 
+                () -> joueur.setCanMove(true)
             )
         );
         objetsBibliotheque.add(tableBibliotheque);
@@ -303,8 +308,10 @@ public class GameController {
                 // Trigger the object if 'A' is pressed and player is facing it
                 if (pressedA && regardeBonneDirection) {
                     obj.trigger();
+                    if (obj.isAlreadyTriggered()) {
                     // Mettre à jour l'inventaire après le déclenchement de l'objet
                     ajouterItemsInventaire();
+                    }
                 }
             } else {
                 obj.setActive(false);
