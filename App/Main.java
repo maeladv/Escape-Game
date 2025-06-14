@@ -89,29 +89,6 @@ public class Main {
         // Exécuter l'initialisation de la fenêtre dans l'EDT (Event Dispatch Thread)
         SwingUtilities.invokeLater(() -> {
             initialiserFenetre();
-
-            
-            // Ajouter des items à l'inventaire
-            try {
-                Item balai = new Item("Balai", "Un balai pour nettoyer les lieux", new File("assets/items/balai.png"));
-                inventaire.ajouterItem(balai);
-                
-                Item livre = new Item("Livre", "Un livre ancien avec des inscriptions mystérieuses", new File("assets/joueur/gauche.png"));
-                inventaire.ajouterItem(livre);
-                
-                Item clef = new Item("Clef", "Une clef en métal qui pourrait ouvrir une porte", new File("assets/joueur/haut.png"));
-                inventaire.ajouterItem(clef);
-                  // Mettre à jour l'affichage de l'inventaire
-                inventaireUI.updateInventaire(inventaire);
-                
-                // Afficher les items dans la console
-                inventaire.getItems().forEach(item -> {
-                    GameUtils.printDev("Item dans l'inventaire : " + item.getNom() + " - " + item.getDescription(), devMode);
-                });
-            } catch (Exception e) {
-                GameUtils.printDev("Erreur lors de l'initialisation des items : " + e.getMessage(), devMode);
-                e.printStackTrace();
-            }
         });
     }
 }

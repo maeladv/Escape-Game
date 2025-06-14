@@ -8,6 +8,7 @@ import java.util.List;
 import App.Dialogue.DialogueManager;
 import App.Inventaire.Inventaire;
 import App.Inventaire.InventaireUI;
+import App.Inventaire.Item;
 import App.Joueur.Joueur;
 import App.Map.Map;
 import App.Objets.Objet;
@@ -32,6 +33,7 @@ public class GameController {
     private int currentMapIndex = 0;
     private List<List<Objet>> objetsParMap;
     private List<List<Rectangle>> mursParMap;
+    private List<Item> allItems; // Liste de tous les items disponibles dans le jeu
 
     public GameController(Map map, Joueur joueur, Inventaire inventaire, InventaireUI inventaireUI, 
                          boolean devMode, int playerSize, int interactionZoneSize) {
@@ -46,6 +48,7 @@ public class GameController {
         // Initialize collections
         this.objetsParMap = new ArrayList<>();
         this.mursParMap = new ArrayList<>();
+        this.allItems = new ArrayList<>();
         
         // Create the DialogueManager
         this.dialogueManager = new DialogueManager(map);
@@ -89,7 +92,7 @@ public class GameController {
         
         // Door object that changes map when interacted with
         objetsIntro.add(new Objet("porte d'entrée",
-            new Rectangle(540, 310, 70, 110),
+            new Rectangle(540, 310, 70, 110), inventaire,
             () -> {
                 changeMap(1);
                 GameUtils.printDev("Interaction avec la porte de la map 0 ! Changement de map.", devMode);
@@ -154,19 +157,10 @@ public class GameController {
         // Initialize objects for map 1 (Library)
         List<Objet> objetsBibliotheque = new ArrayList<>();
         
-        // Table with dialogue
-        objetsBibliotheque.add(new Objet("table de la bibliothèque",
-            new Rectangle(600, 510, 50, 20),
-            () -> dialogueManager.afficherDialogue(
-                "Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.", 
-                "OK", 
-                () -> joueur.setCanMove(true)
-            )
-        ));
-        
+
         // Bookshelf with multi-step dialogue
-        objetsBibliotheque.add(new Objet("bibliothèque entree",
-            new Rectangle(70, 480, 50, 20),
+        Objet bibliothequeEntree = new Objet("bibliothèque entree",
+            new Rectangle(70, 480, 50, 20), inventaire,
             () -> {
                 String[] messages = {
                     "Ah! Il semblerait que l'on puisse interagir avec ces bibliotheques.",
@@ -178,9 +172,33 @@ public class GameController {
                 };
                 dialogueManager.afficherScript(messages, "Suivant", () -> joueur.setCanMove(true));
             }
-        ));
+        );
+        objetsBibliotheque.add(bibliothequeEntree);
         
         objetsParMap.add(objetsBibliotheque);
+
+        Item livre = new Item("Livre ancien", "Un livre poussiéreux qui semble très ancien.", new java.io.File("assets/items/balai.png"), bibliothequeEntree);
+        // Ajouter l'item à la liste globale des items
+        allItems.add(livre);
+
+        // Table with dialogue
+        Objet tableBibliotheque = new Objet("table de la bibliothèque",
+            new Rectangle(600, 510, 50, 20), inventaire, livre,
+            () -> dialogueManager.afficherDialogue(
+                "Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.", 
+                "OK", 
+                () -> joueur.setCanMove(true)
+            ),
+            () -> dialogueManager.afficherDialogue(
+                "Trouver le livre pour interagir. Appuyez sur OK pour continuer.", 
+                "OK", 
+                () -> joueur.setCanMove(true)
+            )
+        );
+        objetsBibliotheque.add(tableBibliotheque);
+
+        Item bougie = new Item("Bougie", "Une bougie qui semble encore allumée.", new java.io.File("assets/joueur/droite.png"), tableBibliotheque);
+        allItems.add(bougie);
         
         // Set initial map's walls to Map class
         map.setMurs(new ArrayList<>(mursParMap.get(currentMapIndex)));
@@ -233,6 +251,9 @@ public class GameController {
                 }
             });
         }
+        
+        // Mettre à jour l'inventaire après changement de carte
+        ajouterItemsInventaire();
     }
     
     /**
@@ -287,6 +308,10 @@ public class GameController {
                 // Trigger the object if 'A' is pressed and player is facing it
                 if (pressedA && regardeBonneDirection) {
                     obj.trigger();
+                    if (obj.isAlreadyTriggered()) {
+                    // Mettre à jour l'inventaire après le déclenchement de l'objet
+                    ajouterItemsInventaire();
+                    }
                 }
             } else {
                 obj.setActive(false);
@@ -306,10 +331,40 @@ public class GameController {
         for (Objet obj : objetsParMap.get(currentMapIndex)) {
             if (joueurBox.intersects(obj.getHitbox()) && pressedA) {
                 obj.trigger();
+                // Mettre à jour l'inventaire après le déclenchement de l'objet
+                ajouterItemsInventaire();
             }
         }
     }
-    
+
+
+
+    // ajouter les items de la map à l'inventaire
+    public void ajouterItemsInventaire() {
+        // Parcourir tous les items disponibles dans le jeu
+        for (Item item : allItems) {
+            // Vérifier si l'objet associé à cet item a été déclenché
+            if (item.getObjet() != null && item.getObjet().isAlreadyTriggered()) {
+                // Vérifier si l'item n'est pas déjà dans l'inventaire
+                if (!inventaire.contientItem(item.getName())) {
+                    // Ajouter l'item à l'inventaire
+                    inventaire.ajouterItem(item);
+                    GameUtils.printDev("Item ajouté à l'inventaire: " + item.getName(), devMode);
+                }
+            }
+        }
+        // Mettre à jour l'interface de l'inventaire
+        updateInventaireUI();
+    }
+
+    /**
+     * Update the inventory UI
+     */
+    public void updateInventaireUI() {
+        inventaireUI.updateInventaire(inventaire);
+    }
+
+
     // Les getters et setters ont été regroupés à la fin
     
     public Map getMap() {
