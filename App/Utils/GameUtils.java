@@ -1,5 +1,12 @@
 package App.Utils;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.util.List;
+import App.Objets.Objet;
+
 /**
  * Classe utilitaire qui contient des méthodes partagées par plusieurs classes
  * Permet de centraliser les méthodes communes pour éviter la duplication de code
@@ -16,6 +23,8 @@ public class GameUtils {
             System.out.println(message);
         }
     }
+
+
     
     /**
      * Crée une zone d'interaction autour d'un point avec une marge donnée
@@ -53,6 +62,47 @@ public class GameUtils {
                 return diffY > 0 && Math.abs(diffY) > Math.abs(diffX);
             default:
                 return false;
+        }
+    }
+    
+    /**
+     * Affiche les rectangles de collision (murs et objets) si le mode développeur est activé
+     * @param g Graphics pour dessiner
+     * @param murs Liste des rectangles représentant les murs
+     * @param objets Liste des objets avec hitbox
+     * @param devMode True si le mode développeur est activé
+     */
+    public static void drawDebugRectangles(Graphics g, List<java.awt.Rectangle> murs, List<Objet> objets, boolean devMode) {
+        if (!devMode) return;
+        
+        // Dessiner les murs (semi-transparent blanc)
+        g.setColor(new Color(255, 255, 255, 50));
+        for (Rectangle mur : murs) {
+            g.fillRect(mur.x, mur.y, mur.width, mur.height);
+        }
+        
+        // Dessiner les hitbox des objets
+        if (objets != null) {
+            for (Objet objet : objets) {
+                Rectangle hitbox = objet.getHitbox();
+                
+                // Objets actifs en jaune plus opaque (alpha=150), inactifs en jaune transparent (alpha=50)
+                if (objet.isActive()) {
+                    // Objet actif - plus visible
+                    g.setColor(new Color(255, 255, 0, 150));
+                    g.fillRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+                    
+                    // Contour plus visible pour les objets actifs
+                    g.setColor(new Color(255, 200, 0, 255));
+                    g.drawRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+                } else {
+                    // Objet inactif - moins visible
+                    g.setColor(new Color(255, 255, 0, 50));
+                    g.fillRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+                }
+                g.setColor(Color.YELLOW);
+                g.drawString(objet.getName(), hitbox.x, hitbox.y - 5);
+            }
         }
     }
 }

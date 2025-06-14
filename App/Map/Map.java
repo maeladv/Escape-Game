@@ -105,21 +105,12 @@ public class Map extends JPanel {
         layers.add(topLayer);
     }
     
-    // Mettre à jour la position du joueur
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         // Dessiner tous les layers de la map
         for (Layer layer : layers) {
             layer.draw(g);
-        }
-        // Si le mode développeur est activé, on affiche plus d'informations
-        if (devMode) {
-            // Dessiner les murs pour debug (en couleur vive)
-            g.setColor(new Color(255,255,255,50));
-            for (Rectangle mur : murs) {
-                g.fillRect(mur.x, mur.y, mur.width, mur.height);
-            }
         }
     }
 
@@ -190,6 +181,47 @@ public class Map extends JPanel {
     public void addPlayerLayerElement(Drawable drawable) {
         if (layers != null && layers.size() >= 2) {
             layers.get(1).addElement(drawable);
+        }
+    }
+    
+    /**
+     * Ajoute un élément à dessiner sur la couche de debug (par-dessus tout)
+     * @param drawable L'élément à dessiner
+     */
+    public void addDebugLayerElement(Drawable drawable) {
+        if (layers != null && layers.size() >= 3) {
+            layers.get(2).addElement(drawable);
+        }
+    }
+    
+    /**
+     * Supprime tous les éléments de debug ajoutés à la couche supérieure
+     * tout en préservant l'image de fond de la couche
+     */
+    public void clearDebugLayer() {
+        if (layers != null && layers.size() >= 3) {
+            // Sauvegarder l'image de fond de la couche
+            final Layer topLayer = layers.get(2);
+            final BufferedImage[] finalMap2Images = new BufferedImage[secondLayerPath.length];
+            try {
+                BufferedImage map2Image = ImageIO.read(new File(secondLayerPath[displayedMap]));
+                finalMap2Images[displayedMap] = map2Image;
+                
+                // Effacer la couche et remettre seulement l'image de fond
+                topLayer.clear();
+                topLayer.addElement(new Drawable() {
+                    @Override
+                    public void draw(Graphics g) {
+                        BufferedImage img = finalMap2Images[displayedMap];
+                        if (img != null) {
+                            g.drawImage(img, 0, 0, width, height, null);
+                        }
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+                GameUtils.printDev("Erreur lors du chargement de l'image de la deuxième couche : " + e.getMessage(), devMode);
+            }
         }
     }
 }
