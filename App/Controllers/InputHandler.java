@@ -16,6 +16,7 @@ public class InputHandler {
     private GameController gameController;
     private Map map;
     private Joueur joueur;
+    private int playerSize; // Taille du joueur obtenue de GameController
     
     /**
      * Constructor for InputHandler
@@ -27,6 +28,7 @@ public class InputHandler {
         this.gameController = gameController;
         this.map = map;
         this.joueur = joueur;
+        this.playerSize = gameController.getPlayerSize();
         
         // Setup keyboard listener
         setupKeyboardListener();
@@ -49,7 +51,7 @@ public class InputHandler {
                 
                 int nextX = joueur.getX();
                 int nextY = joueur.getY();
-                int taille = 40;
+                int playerSize = gameController.getPlayerSize();
                 boolean pressedA = false;
                 
                 // Handle key press
@@ -92,9 +94,9 @@ public class InputHandler {
                     // Only check the collision for the feet of the player
                     boolean collision = gameController.checkCollision(
                         nextX, 
-                        nextY + ((2 * taille) / 3), 
-                        taille, 
-                        (taille / 3)
+                        nextY + ((2 * playerSize) / 3), 
+                        playerSize, 
+                        (playerSize / 3)
                     );
                     
                     // Move the player if no collision

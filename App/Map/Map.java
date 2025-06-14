@@ -3,6 +3,7 @@ import javax.swing.*;
 
 import App.Objets.Objet;
 import App.Utils.Drawable;
+import App.Utils.GameUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -17,7 +18,8 @@ import java.util.List;
  * This class has been refactored to focus primarily on display functionality,
  * with game logic moved to the GameController class.
  */
-public class Map extends JPanel {    private int width;
+public class Map extends JPanel {
+    private int width;
     private int height;
     private int displayedMap = 0; // Indice de la map affichée
     private String[] mapPath = {"assets/maps/intro/map.png","assets/maps/library/map.png"};
@@ -26,7 +28,7 @@ public class Map extends JPanel {    private int width;
     private ArrayList<Rectangle> murs = new ArrayList<>();
     private boolean devMode; // Option de développement, à désactiver en prod
     
-    private List<Layer> layers;    
+    private List<Layer> layers;
     
     // Création et initialisation de la map
     public Map(boolean devMode) {
@@ -39,7 +41,7 @@ public class Map extends JPanel {    private int width;
             mapImage = ImageIO.read(new File(mapPath[displayedMap]));
         } catch (IOException e) {
             e.printStackTrace();
-            printDev("Erreur lors du chargement de l'image de la map : " + e.getMessage());
+            GameUtils.printDev("Erreur lors du chargement de l'image de la map : " + e.getMessage(), devMode);
         }
         
         this.setPreferredSize(new Dimension(width, height));
@@ -51,7 +53,8 @@ public class Map extends JPanel {    private int width;
         setFocusable(true);
         requestFocusInWindow();
     }
-      /**
+    
+    /**
      * Initialize the layers for rendering the map
      */
     private void initializeLayers() {
@@ -68,7 +71,7 @@ public class Map extends JPanel {    private int width;
             map2Image = ImageIO.read(new File(secondLayerPath[displayedMap]));
         } catch (IOException e) {
             e.printStackTrace();
-            printDev("Erreur lors du chargement de l'image de la deuxième couche : " + e.getMessage());
+            GameUtils.printDev("Erreur lors du chargement de l'image de la deuxième couche : " + e.getMessage(), devMode);
         }
         
         // Store layer images for each map
@@ -99,7 +102,8 @@ public class Map extends JPanel {    private int width;
         // Add layers in correct order: background, player, top
         layers.add(backgroundLayer);
         layers.add(playerLayer);
-        layers.add(topLayer);    }
+        layers.add(topLayer);
+    }
     
     // Mettre à jour la position du joueur
     @Override
@@ -116,12 +120,6 @@ public class Map extends JPanel {    private int width;
             for (Rectangle mur : murs) {
                 g.fillRect(mur.x, mur.y, mur.width, mur.height);
             }
-        }
-    }
-    // affichage en mode développeur uniquement
-    private void printDev(String message) {
-        if (devMode) {
-            System.out.println(message);
         }
     }
 
@@ -142,7 +140,9 @@ public class Map extends JPanel {    private int width;
     public boolean isDevMode() { return devMode; }
     public void setDevMode(boolean devMode) { this.devMode = devMode; }
     public List<Layer> getLayers() { return layers; }
-    public void setLayers(List<Layer> layers) { this.layers = layers; }    /**
+    public void setLayers(List<Layer> layers) { this.layers = layers; }
+    
+    /**
      * Change la map affichée
      * @param displayedMap L'indice de la map à afficher
      */
@@ -173,12 +173,12 @@ public class Map extends JPanel {    private int width;
                     });
                 } catch (IOException e) {
                     e.printStackTrace();
-                    printDev("Erreur lors du chargement de l'image de la deuxième couche : " + e.getMessage());
+                    GameUtils.printDev("Erreur lors du chargement de l'image de la deuxième couche : " + e.getMessage(), devMode);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-            printDev("Erreur lors du chargement de l'image de la map : " + e.getMessage());
+            GameUtils.printDev("Erreur lors du chargement de l'image de la map : " + e.getMessage(), devMode);
         }
         repaint();
     }
@@ -186,7 +186,8 @@ public class Map extends JPanel {    private int width;
     /**
      * Ajoute un élément à dessiner sur la couche du joueur
      * @param drawable L'élément à dessiner
-     */    public void addPlayerLayerElement(Drawable drawable) {
+     */
+    public void addPlayerLayerElement(Drawable drawable) {
         if (layers != null && layers.size() >= 2) {
             layers.get(1).addElement(drawable);
         }

@@ -10,6 +10,7 @@ import App.Inventaire.InventaireUI;
 import App.Joueur.Joueur;
 import App.Map.Map;
 import App.Objets.Objet;
+import App.Utils.GameUtils;
 
 /**
  * GameController centralizes game logic and coordinates between different components.
@@ -89,7 +90,7 @@ public class GameController {
             new Rectangle(540, 310, 70, 110),
             () -> {
                 changeMap(1);
-                printDev("Interaction avec la porte de la map 0 ! Changement de map.");
+                GameUtils.printDev("Interaction avec la porte de la map 0 ! Changement de map.", devMode);
                 joueur.setPosition(50, 530);
                 joueur.setState(1);
                 map.repaint();
@@ -225,48 +226,30 @@ public class GameController {
      * @param pressedA True if the 'A' key is pressed
      */
     public void checkObjectInteractions(boolean pressedA) {
-        // Create interaction zone around player
-        Rectangle zoneInteraction = new Rectangle(
-            joueur.getX() - interactionZoneSize, 
-            joueur.getY() - interactionZoneSize, 
-            playerSize + (interactionZoneSize * 2), 
-            playerSize + (interactionZoneSize * 2)
+        // Create interaction zone around player using utility method
+        Rectangle zoneInteraction = GameUtils.createInteractionZone(
+            joueur.getX(), joueur.getY(), playerSize, interactionZoneSize
         );
         
         // Check all objects in the current map
         for (Objet obj : objetsParMap.get(currentMapIndex)) {
             if (zoneInteraction.intersects(obj.getHitbox())) {
                 // Calculate object and player centers for direction checking
-                boolean regardeBonneDirection = false;
                 int centreObjetX = obj.getHitbox().x + obj.getHitbox().width / 2;
                 int centreObjetY = obj.getHitbox().y + obj.getHitbox().height / 2;
                 int centreJoueurX = joueur.getX() + playerSize / 2;
                 int centreJoueurY = joueur.getY() + playerSize / 2;
                 
-                // Check if player is facing the object
-                int diffX = centreObjetX - centreJoueurX;
-                int diffY = centreObjetY - centreJoueurY;
-                
-                switch (joueur.getState()) {
-                    case 0: // Left
-                        regardeBonneDirection = diffX < 0 && Math.abs(diffX) > Math.abs(diffY);
-                        break;
-                    case 1: // Right
-                        regardeBonneDirection = diffX > 0 && Math.abs(diffX) > Math.abs(diffY);
-                        break;
-                    case 2: // Up
-                        regardeBonneDirection = diffY < 0 && Math.abs(diffY) > Math.abs(diffX);
-                        break;
-                    case 3: // Down
-                        regardeBonneDirection = diffY > 0 && Math.abs(diffY) > Math.abs(diffX);
-                        break;
-                }
+                // Check if player is facing the object using the utility method
+                boolean regardeBonneDirection = GameUtils.playerFacingObject(
+                    centreJoueurX, centreJoueurY, centreObjetX, centreObjetY, joueur.getState()
+                );
                 
                 // Set object active state based on whether player is facing it
                 obj.setActive(regardeBonneDirection);
                 
                 if (devMode && regardeBonneDirection) {
-                    printDev("Objet interactif à proximité immédiate. Appuyez sur 'A' pour interagir.");
+                    GameUtils.printDev("Objet interactif à proximité immédiate. Appuyez sur 'A' pour interagir.", devMode);
                 }
                 
                 // Trigger the object if 'A' is pressed and player is facing it
@@ -295,17 +278,7 @@ public class GameController {
         }
     }
     
-    /**
-     * Debug print method
-     * @param message Message to print
-     */
-    private void printDev(String message) {
-        if (devMode) {
-            System.out.println(message);
-        }
-    }
-    
-    // Getters and setters
+    // Les getters et setters ont été regroupés à la fin
     
     public Map getMap() {
         return map;
@@ -333,5 +306,13 @@ public class GameController {
     
     public void setDevMode(boolean devMode) {
         this.devMode = devMode;
+    }
+    
+    public int getPlayerSize() {
+        return playerSize;
+    }
+    
+    public int getInteractionZoneSize() {
+        return interactionZoneSize;
     }
 }
