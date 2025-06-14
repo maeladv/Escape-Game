@@ -1,5 +1,6 @@
 package App.Controllers;
 
+import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import App.Inventaire.InventaireUI;
 import App.Joueur.Joueur;
 import App.Map.Map;
 import App.Objets.Objet;
+import App.Utils.Drawable;
 import App.Utils.GameUtils;
 
 /**
@@ -98,6 +100,18 @@ public class GameController {
         ));
         
         objetsParMap.add(objetsIntro);
+        
+        // Ajouter un élément drawable pour afficher les informations de debug
+        if (devMode) {
+            map.addDebugLayerElement(new Drawable() {
+                @Override
+                public void draw(Graphics g) {
+                    if (devMode && currentMapIndex < mursParMap.size() && currentMapIndex < objetsParMap.size()) {
+                        GameUtils.drawDebugRectangles(g, mursParMap.get(currentMapIndex), objetsParMap.get(currentMapIndex), devMode);
+                    }
+                }
+            });
+        }
 
         // Initialize walls for map 1 (Library)
         List<Rectangle> mursBibliotheque = new ArrayList<>();
@@ -201,6 +215,20 @@ public class GameController {
         currentMapIndex = mapIndex;
         map.setDisplayedMap(mapIndex);
         map.setMurs(new ArrayList<>(mursParMap.get(mapIndex)));
+        
+        // Mettre à jour l'élément de débogage pour la nouvelle carte
+        if (devMode) {
+            // Supprimer l'ancien élément de débogage et en ajouter un nouveau
+            map.clearDebugLayer();
+            map.addDebugLayerElement(new Drawable() {
+                @Override
+                public void draw(Graphics g) {
+                    if (devMode && currentMapIndex < mursParMap.size() && currentMapIndex < objetsParMap.size()) {
+                        GameUtils.drawDebugRectangles(g, mursParMap.get(currentMapIndex), objetsParMap.get(currentMapIndex), devMode);
+                    }
+                }
+            });
+        }
     }
     
     /**
