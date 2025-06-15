@@ -89,16 +89,42 @@ public class GameController {
 
         // Initialize objects for map 0 (Introduction)
         List<Objet> objetsIntro = new ArrayList<>();
+
+        Objet cle = new Objet("cle",
+            new Rectangle(780, 500, 20, 20), inventaire,
+            () -> {
+                dialogueManager.afficherDialogue(
+                    "Vous avez trouvé une clé ! Elle pourrait être utile pour ouvrir des portes.",
+                    "OK",
+                    () -> {
+                        joueur.setCanMove(true);
+                    }
+                );
+            }
+        );
+        objetsIntro.add(cle);
+
+        Item itemCle = new Item("Clé", "Une clé rouillée qui semble ancienne.", new java.io.File("assets/items/balai.png"), cle);
+        allItems.add(itemCle);
         
         // Door object that changes map when interacted with
         objetsIntro.add(new Objet("porte d'entrée",
-            new Rectangle(540, 310, 70, 110), inventaire,
+            new Rectangle(540, 310, 70, 110), inventaire, itemCle,
             () -> {
                 changeMap(1);
                 GameUtils.printDev("Interaction avec la porte de la map 0 ! Changement de map.", devMode);
                 joueur.setPosition(50, 530);
                 joueur.setState(1);
                 map.repaint();
+            },
+            () -> {
+                dialogueManager.afficherDialogue(
+                    "Vous avez besoin d'une clé pour ouvrir cette porte.",
+                    "OK",
+                    () -> {
+                        joueur.setCanMove(true);
+                    }
+                );
             }
         ));
         
