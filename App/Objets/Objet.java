@@ -64,4 +64,6 @@ public class Objet {
     public void setOnCollision(Runnable onCollision) { this.onCollision = onCollision; }
     public boolean isAlreadyTriggered() { return alreadyTriggered; }
     public void setAlreadyTriggered(boolean alreadyTriggered) { this.alreadyTriggered = alreadyTriggered; }
+    public Item getItemToInteract() { return itemToInteract; }
+    public void setItemToInteract(Item itemToInteract) { this.itemToInteract = itemToInteract; }
 }
