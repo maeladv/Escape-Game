@@ -335,8 +335,9 @@ public class GameController {
                 if (pressedA && regardeBonneDirection) {
                     obj.trigger();
                     if (obj.isAlreadyTriggered()) {
-                    // Mettre à jour l'inventaire après le déclenchement de l'objet
-                    ajouterItemsInventaire();
+                        // Mettre à jour l'inventaire après le déclenchement de l'objet
+                        ajouterItemsInventaire();
+                        supprimerItemInventaire();
                     }
                 }
             } else {
@@ -359,6 +360,7 @@ public class GameController {
                 obj.trigger();
                 // Mettre à jour l'inventaire après le déclenchement de l'objet
                 ajouterItemsInventaire();
+                supprimerItemInventaire();
             }
         }
     }
@@ -376,6 +378,24 @@ public class GameController {
                     // Ajouter l'item à l'inventaire
                     inventaire.ajouterItem(item);
                     GameUtils.printDev("Item ajouté à l'inventaire: " + item.getName(), devMode);
+                }
+            }
+        }
+        // Mettre à jour l'interface de l'inventaire
+        updateInventaireUI();
+    }
+
+    public void supprimerItemInventaire() {
+        // Parcourir toutes les maps pour chercher les objets déclenchés
+        for (int mapIndex = 0; mapIndex < objetsParMap.size(); mapIndex++) {
+            for (Objet obj : objetsParMap.get(mapIndex)) {
+                // Vérifier si l'objet a été déclenché et s'il a un item associé
+                if (obj.isAlreadyTriggered() && obj.getItemToInteract() != null) {
+                    // Supprimer l'item de l'inventaire
+                    if (inventaire.contientItem(obj.getItemToInteract())) {
+                        inventaire.retirerItem(obj.getItemToInteract());
+                        GameUtils.printDev("Item supprimé de l'inventaire: " + obj.getItemToInteract().getName(), devMode);
+                    }
                 }
             }
         }
