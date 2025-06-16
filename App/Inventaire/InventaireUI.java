@@ -55,8 +55,7 @@ public class InventaireUI extends JPanel {
                     Item selectedItem = items.get(index);
                     dialogueManager.afficherDialogue(
                         selectedItem.getName()+ " : "  + selectedItem.getDescription(),
-                        "OK",  // Texte du bouton
-                        null   // Pas d'action spécifique à exécuter à la fermeture
+                        "OK"  // Texte du bouton
                     );
                 }
             }

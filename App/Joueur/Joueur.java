@@ -42,17 +42,39 @@ public class Joueur {
         } else {
             g.setColor(Color.RED);
             g.fillOval(x, y, 40, 40);
+        }    }
+
+    public void deplacerGauche() { 
+        if (canMove) {
+            x -= speed; 
+            state = 0;
         }
     }
-
-    public void deplacerGauche() { x -= speed; state = 0; }
-    public void deplacerDroite() { x += speed; state = 1; }
-    public void deplacerHaut() { y -= speed; state = 2; }
-    public void deplacerBas() { y += speed; state = 3; }
-
-    public void setPosition(int x, int y) {
-        this.x = x;
-        this.y = y;
+    
+    public void deplacerDroite() { 
+        if (canMove) {
+            x += speed; 
+            state = 1;
+        }
+    }
+    
+    public void deplacerHaut() { 
+        if (canMove) {
+            y -= speed; 
+            state = 2;
+        }
+    }
+    
+    public void deplacerBas() { 
+        if (canMove) {
+            y += speed; 
+            state = 3;
+        }
+    }    public void setPosition(int x, int y) {
+        if (canMove) {
+            this.x = x;
+            this.y = y;
+        }
     }
 
     // Getters et setters

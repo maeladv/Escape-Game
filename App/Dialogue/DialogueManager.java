@@ -4,22 +4,34 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
+import App.Joueur.Joueur;
+
 public class DialogueManager {
     private JPanel parent;
     private DialoguePersonnalise currentDialogue;
     private JButton currentButton;
     private Runnable onCloseGlobal;
+    private Joueur joueur;
 
-    public DialogueManager(JPanel parent) {
+    public DialogueManager(JPanel parent, Joueur joueur) {
         this.parent = parent;
+        this.joueur = joueur;
+    }    public void afficherDialogue(String message, String boutonTexte) {
+        afficherDialogue(message, boutonTexte, null);
     }
-
+    
     public void afficherDialogue(String message, String boutonTexte, Runnable onClose) {
+        joueur.setCanMove(false); // Désactiver le mouvement du joueur pendant le dialogue
         removeCurrentDialogue();
         currentDialogue = new DialoguePersonnalise(message, boutonTexte, () -> {
             removeCurrentDialogue();
-            if (onClose != null) onClose.run();
-            if (onCloseGlobal != null) onCloseGlobal.run();
+            joueur.setCanMove(true); // Réactiver le mouvement du joueur après fermeture
+            if (onClose != null) {
+                onClose.run();
+            }
+            if (onCloseGlobal != null) {
+                onCloseGlobal.run();
+            }
         });
         parent.add(currentDialogue);
         currentDialogue.setBounds((parent.getWidth() - (parent.getWidth() * 3 / 4)) / 2, parent.getHeight() - parent.getHeight() / 4 - 20, parent.getWidth() * 3 / 4, parent.getHeight() / 4);
@@ -29,8 +41,10 @@ public class DialogueManager {
         
         // S'assurer que la boîte de dialogue prend le focus pour capter les événements clavier
         currentDialogue.requestFocusInWindow();
+    }    public void afficherScript(String[] messages, String boutonTexte) {
+        afficherScript(messages, boutonTexte, null);
     }
-
+    
     public void afficherScript(String[] messages, String boutonTexte, Runnable onAllClose) {
         if (messages == null || messages.length == 0) return;
         final int[] index = {0};
@@ -41,8 +55,6 @@ public class DialogueManager {
                 if (index[0] < messages.length - 1) {
                     index[0]++;
                     afficherDialogue(messages[index[0]], boutonTexte, this);
-                } else {
-                    if (onAllClose != null) onAllClose.run();
                 }
             }
         };
