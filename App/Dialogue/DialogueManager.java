@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
 
 import App.Joueur.Joueur;
 
@@ -82,6 +84,7 @@ public class DialogueManager {
         private int animationSpeed = 40;
         private static final int MAX_LINES = 3;
         private static final int MAX_CHARS_PER_LINE = 50;
+        private JPanel customPanel; // Pour le constructeur avec panel personnalisé
 
         static {
             try {

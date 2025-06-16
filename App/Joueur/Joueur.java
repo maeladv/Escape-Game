@@ -12,7 +12,7 @@ public class Joueur {
     private int state; // 0 : gauche, 1 : droite, 2 : haut, 3 : bas
     private int speed;
     private boolean canMove = true; // Indique si le joueur peut se déplacer
-    private boolean devMode = true; // Mode développeur activé par défaut
+    private boolean devMode; 
     // Ordre : gauche, droite, haut, bas
     private final String[] image_paths = {"assets/joueur/gauche.png", "assets/joueur/droite.png", "assets/joueur/haut.png", "assets/joueur/bas.png"};
     private BufferedImage[] joueurImages = new BufferedImage[4];    public Joueur(int x, int y, int speed) {
@@ -77,11 +77,11 @@ public class Joueur {
             y += speed; 
             state = 3;
         }
-    }    public void setPosition(int x, int y) {
-        if (canMove) {
-            this.x = x;
-            this.y = y;
-        }
+    }
+    
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
     // Getters et setters
