@@ -100,7 +100,7 @@ public class GameController {
         );
         objetsIntro.add(cle);
 
-        Item itemCle = new Item("Clé", "Une clé rouillée qui semble ancienne.", new java.io.File("assets/items/balai.png"), cle);
+        Item itemCle = new Item("Clé", "Une clé rouillée qui semble ancienne.", new java.io.File("assets/items/clef.png"), cle);
         allItems.add(itemCle);
         
         // Door object that changes map when interacted with
@@ -196,7 +196,7 @@ public class GameController {
         
         objetsParMap.add(objetsBibliotheque);
 
-        Item livre = new Item("Livre ancien", "Un livre poussiéreux qui semble très ancien.", new java.io.File("assets/items/balai.png"), bibliothequeEntree);
+        Item livre = new Item("Livre ancien", "Un livre poussiéreux qui semble très ancien.", new java.io.File("assets/items/livre.png"), bibliothequeEntree);
         // Ajouter l'item à la liste globale des items
         allItems.add(livre);
 
@@ -216,7 +216,7 @@ public class GameController {
         );
         objetsBibliotheque.add(tableBibliotheque);
 
-        Item bougie = new Item("Bougie", "Une bougie qui semble encore allumée.", new java.io.File("assets/joueur/droite.png"), tableBibliotheque);
+        Item bougie = new Item("Bougie", "Une bougie qui semble encore allumée.", new java.io.File("assets/items/default.png"), tableBibliotheque);
         allItems.add(bougie);
         
         // Set initial map's walls to Map class
