@@ -50,8 +50,8 @@ public class GameController {
         this.mursParMap = new ArrayList<>();
         this.allItems = new ArrayList<>();
         
-        // Create the DialogueManager
-        this.dialogueManager = new DialogueManager(map);
+        // Create the DialogueManager with a reference to the player
+        this.dialogueManager = new DialogueManager(map, joueur);
         
         // Set the DialogueManager to the InventaireUI
         this.inventaireUI.setDialogueManager(dialogueManager);
@@ -95,11 +95,7 @@ public class GameController {
             () -> {
                 dialogueManager.afficherDialogue(
                     "Vous avez trouvé une clé ! Elle pourrait être utile pour ouvrir des portes.",
-                    "OK",
-                    () -> {
-                        joueur.setCanMove(true);
-                    }
-                );
+                    "OK");
             }
         );
         objetsIntro.add(cle);
@@ -120,10 +116,7 @@ public class GameController {
             () -> {
                 dialogueManager.afficherDialogue(
                     "Vous avez besoin d'une clé pour ouvrir cette porte.",
-                    "OK",
-                    () -> {
-                        joueur.setCanMove(true);
-                    }
+                    "OK"
                 );
             }
         ));
@@ -196,7 +189,7 @@ public class GameController {
                     "Peut-etre que quelqu'un a laisse un message ici ?",
                     "Il y a des livres sur les etageres, mais certaines sont encore trop poussiereuses pour etre ouvertes."
                 };
-                dialogueManager.afficherScript(messages, "Suivant", () -> joueur.setCanMove(true));
+                dialogueManager.afficherScript(messages, "Suivant");
             }
         );
         objetsBibliotheque.add(bibliothequeEntree);
@@ -249,7 +242,7 @@ public class GameController {
         // Utiliser un Timer pour s'assurer que l'interface est complètement initialisée
         javax.swing.Timer timer = new javax.swing.Timer(500, e -> {
             ((javax.swing.Timer)e.getSource()).stop();
-            dialogueManager.afficherScript(introScript, "Suivant", () -> joueur.setCanMove(true));
+            dialogueManager.afficherScript(introScript, "Suivant");
         });
         timer.setRepeats(false);
         timer.start();
