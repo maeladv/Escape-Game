@@ -14,6 +14,8 @@ import App.Map.Map;
 import App.Objets.Objet;
 import App.Utils.Drawable;
 import App.Utils.GameUtils;
+import App.Games.Game;
+import App.Games.MorpionGame;
 
 /**
  * GameController centralizes game logic and coordinates between different components.
@@ -34,6 +36,8 @@ public class GameController {
     private List<List<Objet>> objetsParMap;
     private List<List<Rectangle>> mursParMap;
     private List<Item> allItems; // Liste de tous les items disponibles dans le jeu
+
+    private List<Game> jeux; // Liste des mini-jeux disponibles
 
     public GameController(Map map, Joueur joueur, Inventaire inventaire, InventaireUI inventaireUI, 
                          boolean devMode, int playerSize, int interactionZoneSize) {
@@ -56,6 +60,9 @@ public class GameController {
         // Set the DialogueManager to the InventaireUI
         this.inventaireUI.setDialogueManager(dialogueManager);
         
+        // Initialiser les mini jeux disponibles
+        initializeJeux();
+
         // Initialize the maps and objects
         initializeMapsAndObjects();
         
@@ -118,6 +125,23 @@ public class GameController {
                     "Vous avez besoin d'une clé pour ouvrir cette porte.",
                     "OK"
                 );
+            }
+        ));
+
+        // ajout d'un objet interactif pour un mini jeu Game
+        objetsIntro.add(new Objet("objet interactif",
+            new Rectangle(100, 500, 50, 50), inventaire,
+            () -> {
+                if (!jeux.isEmpty()) {
+                    Game miniJeu = jeux.get(0); // Prendre le premier mini-jeu
+                    GameUtils.printDev("Lancement du mini-jeu: " + miniJeu.getName(), devMode);
+                    miniJeu.afficherMiniJeu(map); // Affiche le mini-jeu dans la même fenêtre
+                } else {
+                    dialogueManager.afficherDialogue(
+                        "Aucun mini-jeu disponible pour le moment.",
+                        "OK"
+                    );
+                }
             }
         ));
         
@@ -196,7 +220,7 @@ public class GameController {
         
         objetsParMap.add(objetsBibliotheque);
 
-        Item livre = new Item("Livre ancien", "Un livre poussiéreux qui semble très ancien.", new java.io.File("assets/items/livre.png"), bibliothequeEntree);
+        Item livre = new Item("Livre ancien", "Un livre poussiéré qui semble très ancien.", new java.io.File("assets/items/livre.png"), bibliothequeEntree);
         // Ajouter l'item à la liste globale des items
         allItems.add(livre);
 
@@ -227,6 +251,30 @@ public class GameController {
         // Set initial map's walls to Map class
         map.setMurs(new ArrayList<>(mursParMap.get(currentMapIndex)));
     }
+
+
+// initialiser les mini-jeux disponibles
+private void initializeJeux() {
+    jeux = new ArrayList<>();
+    jeux.add(new MorpionGame(devMode)); // Ajoute le morpion comme mini-jeu
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     /**
      * Display the introduction script
