@@ -1,6 +1,7 @@
 package App.Games;
 
 import App.Map.Map;
+import App.Utils.GameUtils;
 import App.Dialogue.DialogueManager;
 import javax.swing.*;
 import java.awt.*;
@@ -32,6 +33,12 @@ public abstract class Game {
         this(devMode, name, description, assetsFolder);
         this.dialogueManager = dialogueManager;
     }
+
+    public Game(boolean devMode, String name, String description, String assetsFolder, DialogueManager dialogueManager,Runnable onCloseCallback) {
+        this(devMode, name, description, assetsFolder, onCloseCallback); // ON récupère le constructeur primaire
+        this.dialogueManager = dialogueManager;
+    }
+
 
     // Getters
     public String getName() { return name; }
@@ -68,6 +75,7 @@ public abstract class Game {
         retirerMiniJeu(map);
         setFinished(false);
         afficherMiniJeu(map);
+
     }
 
     /**
@@ -80,7 +88,7 @@ public abstract class Game {
             miniJeuPanel = null;
             map.repaint();
             map.revalidate();
-            if (finished == true) {
+            if (isFinished() == true) {
                 onClose(); // Appeler onClose si le mini-jeu est terminé
             }
         }
@@ -99,14 +107,23 @@ public abstract class Game {
     }
 
     public void setFinished(boolean finished) {
-        boolean wasFinished = this.finished;
         this.finished = finished;
         if (finished && miniJeuPanel != null && miniJeuPanel.getParent() instanceof Map) {
             retirerMiniJeu((Map) miniJeuPanel.getParent());
             // Appeler onClose uniquement si la partie vient de se finir
-            if (!wasFinished) {
+            if (finished == true) {
                 onClose();
+                GameUtils.printDev("Le mini-jeu " + name + " est terminé.", devMode);
+                // printdev le contenu de onclose
+                // if (onCloseCallback != null) {
+                //     GameUtils.printDev("Exécution du callback de fermeture.", devMode);
+                //     onCloseCallback.run();
+                // } else {
+                //     GameUtils.printDev("Aucun callback de fermeture défini.", devMode);
+                // }
+
             }
+            
         }
     }
     public void setOnCloseCallback(Runnable callback) { this.onCloseCallback = callback; }

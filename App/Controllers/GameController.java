@@ -256,7 +256,19 @@ public class GameController {
 // initialiser les mini-jeux disponibles
 private void initializeJeux() {
     jeux = new ArrayList<>();
-    jeux.add(new MorpionGame(devMode, dialogueManager)); // Ajoute le morpion comme mini-jeu
+    jeux.add(new MorpionGame(devMode, dialogueManager, () -> {
+        String[] script= {
+            "Bravo! Vous avez réussi le mini-jeu de morpion !",
+            "Vous pouvez continuer votre aventure dans la bibliothèque."
+        };
+        dialogueManager.afficherScript(script, "Suivant");
+        // donner un objet (la clef)
+        Item clef = new Item("Clé", "Une clé qui ouvre la porte de la bibliothèque.", new java.io.File("assets/items/clef.png"), null);
+        inventaire.ajouterItem(clef);
+        GameUtils.printDev("Mini-jeu de morpion terminé avec succès ! Clé ajoutée à l'inventaire.", devMode);
+
+    }
+    )); // Ajoute le morpion comme mini-jeu
     
 
 }

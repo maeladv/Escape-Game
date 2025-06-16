@@ -16,30 +16,18 @@ public class MorpionGame extends Game {
 
     // Constructeur principal :
     public MorpionGame(boolean devMode, DialogueManager dialogueManager) {
-        super(devMode, "Morpion", "Mini-jeu de morpion", "assets/mini-jeux/morpion", dialogueManager);
+        super(devMode, "Morpion", "Mini-jeu de morpion", "assets/mini-jeux/morpion", dialogueManager,() -> {
+            dialogueManager.afficherDialogue("Bravo! C'est réussi !","Super !");
+        });
+
+
     }
 
-    public MorpionGame(boolean devMode) {
-        super(devMode, "Morpion", "Mini-jeu de morpion", "assets/mini-jeux/morpion",
-                () -> {
-                    GameUtils.printDev("Morpion fermé, état réinitialisé", devMode);
-                    // Afficher message dans un dialogue
-                    String[] messages = {
-                            "Bravo ! Vous avez terminé le mini-jeu de morpion.",
-                            "Voici donc un premier indice :",
-                    };
-                    // dialogueManager.afficherDialogue("Indice : Le code du coffre est 1234.", "OK");
-
-                    
-
-                }
-
-        );
+    // Constructeur pour le mode développeur, avec un callback pour la fermeture
+    public MorpionGame(boolean devMode, DialogueManager dialogueManager, Runnable onCloseCallback) {
+        super(devMode, "Morpion", "Mini-jeu de morpion", "assets/mini-jeux/morpion", dialogueManager, onCloseCallback);
     }
 
-    public MorpionGame(DialogueManager dialogueManager) {
-        super(false, "Morpion", "Mini-jeu de morpion", "assets/mini-jeux/morpion", dialogueManager);
-    }
 
     // Simplifie la logique de jeu du bot et évite les répétitions
     private void botPlay() {
@@ -110,6 +98,8 @@ public class MorpionGame extends Game {
                             if (checkWin()) {
                                 statusLabel.setText("Le joueur X a gagné !");
                                 setFinished(true);
+
+                                
                             } else if (isFull()) {
                                 statusLabel.setText("Match nul !");
                                 setFinished(false);
@@ -174,6 +164,8 @@ public class MorpionGame extends Game {
         if (statusLabel != null) {
             statusLabel.setText("Tour du joueur : X");
         }
+
+        super.onClose();
 
     
     }
