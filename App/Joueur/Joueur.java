@@ -5,31 +5,38 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 
+import App.Utils.GameUtils;
+
 public class Joueur {
     private int x, y; // Position du joueur
     private int state; // 0 : gauche, 1 : droite, 2 : haut, 3 : bas
     private int speed;
     private boolean canMove = true; // Indique si le joueur peut se déplacer
+    private boolean devMode = true; // Mode développeur activé par défaut
     // Ordre : gauche, droite, haut, bas
     private final String[] image_paths = {"assets/joueur/gauche.png", "assets/joueur/droite.png", "assets/joueur/haut.png", "assets/joueur/bas.png"};
-    private BufferedImage[] joueurImages = new BufferedImage[4];
-
-    public Joueur(int x, int y, int speed) {
+    private BufferedImage[] joueurImages = new BufferedImage[4];    public Joueur(int x, int y, int speed) {
+        this(x, y, speed, true); // Par défaut, mode dev activé
+    }
+    
+    public Joueur(int x, int y, int speed, boolean devMode) {
         this.x = x;
         this.y = y;
         this.speed = speed;
         this.state = 1; // par défaut à droite
+        this.devMode = devMode;
+        
         for (int i = 0; i < 4; i++) {
-            System.out.println("Chargement image joueur : " + image_paths[i]);
+            GameUtils.printDev("Chargement image joueur : " + image_paths[i], devMode);
             try {
                 joueurImages[i] = ImageIO.read(new File(image_paths[i]));
                 if (joueurImages[i] != null) {
-                    System.out.println("Image chargée pour direction " + i);
+                    GameUtils.printDev("Image chargée pour direction " + i, devMode);
                 } else {
-                    System.out.println("Image NULL pour direction " + i);
+                    GameUtils.printDev("Image NULL pour direction " + i, devMode);
                 }
             } catch (IOException e) {
-                System.out.println("Erreur chargement image pour direction " + i + " : " + e.getMessage());
+                GameUtils.printDev("Erreur chargement image pour direction " + i + " : " + e.getMessage(), devMode);
                 joueurImages[i] = null;
             }
         }
@@ -89,6 +96,8 @@ public class Joueur {
     public boolean isCanMove() { return canMove; }
     public void setCanMove(boolean canMove) { this.canMove = canMove; }
     public boolean canMove() { return canMove; } // Alias pour la compatibilité
-    public BufferedImage[] getJoueurImages() { return joueurImages; }
-    public String[] getImagePaths() { return image_paths; }
+    public BufferedImage[] getJoueurImages() { return joueurImages; }    public String[] getImagePaths() { return image_paths; }
+    
+    public boolean isDevMode() { return devMode; }
+    public void setDevMode(boolean devMode) { this.devMode = devMode; }
 }

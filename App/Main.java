@@ -33,12 +33,10 @@ public class Main {
         // Créer une fenêtre Jframe avec un titre
         window = new JFrame("Escape From The Biblioteca");
         // Faire en sorte que le script se coupe lorsque l'utilisateur clique sur la croix
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Créer et initialiser l'inventaire
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);        // Créer et initialiser l'inventaire
         inventaire = new Inventaire(5);
         // Créer l'interface de l'inventaire
-        inventaireUI = new InventaireUI(inventaire);
+        inventaireUI = new InventaireUI(inventaire, devMode);
         
         // Positionner l'inventaire en haut à gauche
         inventaireUI.setBounds(10, 10, 400, 100);
@@ -46,7 +44,7 @@ public class Main {
         map = new Map(devMode);
         
         // Créer le joueur
-        joueur = new Joueur(30, 460, 10);
+        joueur = new Joueur(30, 460, 10, devMode);
         
         // Ajouter le joueur au layer du milieu de la map
         map.addPlayerLayerElement(new Drawable() {

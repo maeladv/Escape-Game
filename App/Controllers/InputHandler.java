@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 
 import App.Joueur.Joueur;
 import App.Map.Map;
+import App.Utils.GameUtils;
 
 /**
  * InputHandler manages all user inputs including keyboard and mouse events.
@@ -133,7 +134,7 @@ public class InputHandler {
                         joueur.setPosition(e.getX() - 20, e.getY() - 20);
                         map.repaint();
                     } else { // Left click or other
-                        System.out.println("Clic à la position : x=" + e.getX() + ", y=" + e.getY());
+                        GameUtils.printDev("Clic à la position : x=" + e.getX() + ", y=" + e.getY(), gameController.isDevMode());
                     }
                 }
             }

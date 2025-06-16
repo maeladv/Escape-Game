@@ -2,6 +2,7 @@ package App.Inventaire;
 import javax.swing.*;
 
 import App.Dialogue.DialogueManager;
+import App.Utils.GameUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -16,14 +17,21 @@ public class InventaireUI extends JPanel {
     private int rows = 1;      // Nombre de lignes dans l'inventaire
     private BufferedImage defaultImage; // Image par défaut si l'image de l'item n'est pas disponible
     private DialogueManager dialogueManager;
+    private boolean devMode = true; // Mode développeur activé par défaut
     
     public InventaireUI(Inventaire inventaire) {
+        this(inventaire, true); // Par défaut, mode dev activé
+    }
+    
+    public InventaireUI(Inventaire inventaire, boolean devMode) {
         this.inventaire = inventaire;
+        this.devMode = devMode;
+        
         try {
             // Charger une image par défaut pour les items sans image
             defaultImage = ImageIO.read(new java.io.File("assets/joueur/droite.png"));
         } catch (IOException e) {
-            System.out.println("Erreur lors du chargement de l'image par défaut : " + e.getMessage());
+            GameUtils.printDev("Erreur lors du chargement de l'image par défaut : " + e.getMessage(), devMode);
         }
         
         int cols = (int) Math.ceil(inventaire.getItems().size() / (double) rows);
@@ -96,7 +104,7 @@ public class InventaireUI extends JPanel {
                 } catch (IOException e) {
                     // Utiliser l'image par défaut si l'image de l'item n'est pas disponible
                     itemImage = defaultImage;
-                    System.out.println("Utilisation de l'image par défaut pour : " + item.getName());
+                    GameUtils.printDev("Utilisation de l'image par défaut pour : " + item.getName(), devMode);
                 }
                 
                 if (itemImage != null) {
@@ -110,7 +118,7 @@ public class InventaireUI extends JPanel {
                     g.drawImage(itemImage, imgX, imgY, imgWidth, imgHeight, null);
                 }
             } catch (Exception e) {
-                System.out.println("Erreur lors du dessin de l'image pour " + item.getName() + ": " + e.getMessage());
+                GameUtils.printDev("Erreur lors du dessin de l'image pour " + item.getName() + ": " + e.getMessage(), devMode);
             }
             
             // Dessiner le nom de l'item
@@ -156,4 +164,6 @@ public class InventaireUI extends JPanel {
     public void setDefaultImage(BufferedImage defaultImage) { this.defaultImage = defaultImage; }
     public DialogueManager getDialogueManager() { return dialogueManager; }
     public void setDialogueManager(DialogueManager dialogueManager) { this.dialogueManager = dialogueManager; }
+    public boolean isDevMode() { return devMode; }
+    public void setDevMode(boolean devMode) { this.devMode = devMode; }
 }
