@@ -80,7 +80,9 @@ public abstract class Game {
             miniJeuPanel = null;
             map.repaint();
             map.revalidate();
-            onClose();
+            if (finished == true) {
+                onClose(); // Appeler onClose si le mini-jeu est terminé
+            }
         }
     }
 
@@ -97,9 +99,14 @@ public abstract class Game {
     }
 
     public void setFinished(boolean finished) {
+        boolean wasFinished = this.finished;
         this.finished = finished;
         if (finished && miniJeuPanel != null && miniJeuPanel.getParent() instanceof Map) {
             retirerMiniJeu((Map) miniJeuPanel.getParent());
+            // Appeler onClose uniquement si la partie vient de se finir
+            if (!wasFinished) {
+                onClose();
+            }
         }
     }
     public void setOnCloseCallback(Runnable callback) { this.onCloseCallback = callback; }
