@@ -116,14 +116,29 @@ public class Animation {
      * @param g Le contexte graphique
      */
     private void drawTeleportEffect(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
         long elapsedTime = System.currentTimeMillis() - startTime;
         float progress = Math.min(1.0f, (float) elapsedTime / duration);
+        
+        // Dessiner un halo autour du joueur
+        int centerX = playerX + playerSize / 2;
+        int centerY = playerY + playerSize / 2;
+        int haloSize = (int)(playerSize * 2 * (1 + progress * 0.5f));
+        
+        // Couleur avec transparence
+        float alpha = 0.7f * (1.0f - progress);
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        g2d.setColor(new Color(100, 100, 255, 200));
+        g2d.fillOval(centerX - haloSize/2, centerY - haloSize/2, haloSize, haloSize);
         
         // Dessiner les particules
         for (Particle particle : particles) {
             particle.update(progress);
             particle.draw(g);
         }
+        
+        // Rétablir la transparence normale
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         
         // Vérifier si l'animation est terminée
         if (progress >= 1.0f) {
@@ -196,7 +211,7 @@ public class Animation {
      */
     private void generateParticles() {
         particles.clear();
-        int numParticles = 50;  // Nombre de particules
+        int numParticles = 100;  // Augmentation du nombre de particules pour un effet plus visible
         
         // Centre du joueur
         int centerX = playerX + playerSize / 2;
@@ -207,8 +222,8 @@ public class Animation {
             // Couleur aléatoire (bleu/violet pour effet magique)
             Color color = new Color(
                 random.nextInt(100),              // R: peu de rouge
-                random.nextInt(100) + 100,        // G: vert moyen
-                random.nextInt(100) + 155,        // B: beaucoup de bleu
+                random.nextInt(100) + 155,        // G: plus de vert pour brillance
+                random.nextInt(50) + 205,         // B: beaucoup de bleu
                 255                               // Alpha: opaque
             );
             
@@ -217,11 +232,11 @@ public class Animation {
             int y = centerY + random.nextInt(playerSize) - playerSize / 2;
             
             // Vitesse et direction aléatoires
-            float speedX = (random.nextFloat() * 2 - 1) * 5;  // Entre -5 et 5
-            float speedY = (random.nextFloat() * 2 - 1) * 5;  // Entre -5 et 5
+            float speedX = (random.nextFloat() * 2 - 1) * 8;  // Entre -8 et 8
+            float speedY = (random.nextFloat() * 2 - 1) * 8;  // Entre -8 et 8
             
             // Taille aléatoire
-            int size = random.nextInt(5) + 3;  // Entre 3 et 7
+            int size = random.nextInt(6) + 4;  // Entre 4 et 9
             
             // Ajouter la particule
             particles.add(new Particle(x, y, speedX, speedY, size, color));
@@ -282,14 +297,23 @@ public class Animation {
             // Au début, les particules se déplacent vers l'extérieur
             if (progress < 0.5f) {
                 float factor = progress * 2; // 0.0 -> 1.0 pour la première moitié
-                x = initialX + speedX * factor * 20;
-                y = initialY + speedY * factor * 20;
+                x = initialX + speedX * factor * 30; // Distance augmentée pour un effet plus visible
+                y = initialY + speedY * factor * 30;
+                
+                // Faire grossir légèrement les particules
+                size = (int)(size * (1 + factor * 0.3f));
             } 
             // Puis elles convergent vers le centre
             else {
                 float factor = (progress - 0.5f) * 2; // 0.0 -> 1.0 pour la seconde moitié
-                x = initialX + speedX * 20 * (1 - factor);
-                y = initialY + speedY * 20 * (1 - factor);
+                
+                // Mouvement plus rapide et plus concentré vers la fin
+                float accel = 1 + factor * 2;
+                x = initialX + speedX * 30 * (1 - factor * accel);
+                y = initialY + speedY * 30 * (1 - factor * accel);
+                
+                // Faire rétrécir les particules
+                size = (int)(size * (1 - factor * 0.5f));
             }
             
             // Faire disparaître progressivement les particules à la fin
@@ -308,5 +332,9 @@ public class Animation {
             g.setColor(color);
             g.fillOval((int)x - size/2, (int)y - size/2, size, size);
         }
+    }
+
+    public void setIsrunning(boolean isRunning) {
+        this.isRunning = isRunning;
     }
 }

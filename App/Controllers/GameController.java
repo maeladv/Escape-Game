@@ -202,32 +202,6 @@ public class GameController {
         );
         objetsBibliotheque.add(bibliothequeEntree);
         
-        // Ajout d'une potion de téléportation
-        Objet potionObjet = new Objet("potion de téléportation",
-            new Rectangle(450, 400, 30, 30), inventaire,
-            () -> {
-                dialogueManager.afficherDialogue(
-                    "Vous avez trouvé une potion de téléportation ! Elle semble magique et pourrait vous permettre de vous déplacer instantanément.",
-                    "OK"
-                );
-            }
-        );
-        objetsBibliotheque.add(potionObjet);
-        
-        Item potionItem = new Item("Potion de téléportation", 
-            "Une potion mystérieuse qui permet de se téléporter.", 
-            new java.io.File("assets/items/potion.png"), 
-            potionObjet, 
-            () -> {
-                // Téléporter le joueur à un autre endroit de la map avec animation
-                teleportPlayer(600, 350, 1);
-                dialogueManager.afficherDialogue(
-                    "Vous vous êtes téléporté ! La potion s'est consommée.",
-                    "OK"
-                );
-            }
-        );
-        allItems.add(potionItem);
         
         objetsParMap.add(objetsBibliotheque);
 
@@ -252,12 +226,20 @@ public class GameController {
         objetsBibliotheque.add(tableBibliotheque);
 
 
-        Item bougie = new Item("Bougie", "Une bougie qui semble encore allumée.", new java.io.File("assets/items/default.png"), tableBibliotheque, () -> {
-            joueur.setPosition(430, 530);
-            joueur.setState(2);
+        // Créer d'abord l'item sans l'action
+        Item potionItem = new Item("Potion de téléportation", 
+            "Vous allez être téléporter.", 
+            new java.io.File("assets/items/potion.png"), 
+            tableBibliotheque);
+            
+        // Définir l'action après la création de l'item
+        potionItem.setOnClick(() -> {
+            // Téléporter le joueur à un autre endroit de la map avec animation
+            teleportPlayer(430, 530, 2);
+            inventaire.retirerItem(potionItem); // Maintenant on peut référencer potionItem
         });
 
-        allItems.add(bougie);
+        allItems.add(potionItem);
         
         // Set initial map's walls to Map class
         map.setMurs(new ArrayList<>(mursParMap.get(currentMapIndex)));
@@ -337,12 +319,14 @@ public class GameController {
      * @param state L'orientation du joueur après téléportation
      */
     public void teleportPlayer(int x, int y, int state) {
-        // Si une animation est déjà en cours, ne rien faire
-        if (animation.isRunning()) {
-            return;
-        }
+        GameUtils.printDev("État de l'animation avant téléportation: " + animation.isRunning(), devMode);
         
-        // Désactiver temporairement les mouvements du joueur
+        // Réinitialiser complètement l'animation pour éviter les problèmes
+        resetAnimation();
+        
+        GameUtils.printDev("Téléportation du joueur vers (" + x + ", " + y + ") avec état " + state, devMode);
+
+        // Empêcher le joueur de bouger pendant l'animation
         joueur.setCanMove(false);
         
         // Démarrer l'animation de téléportation
@@ -350,8 +334,7 @@ public class GameController {
             // Déplacer le joueur après l'animation
             joueur.setPosition(x, y);
             joueur.setState(state);
-            
-            // Réactiver les mouvements du joueur
+            // Réactiver les mouvements du joueur après la téléportation
             joueur.setCanMove(true);
         });
     }
@@ -448,7 +431,7 @@ public class GameController {
             // Vérifier si l'objet associé à cet item a été déclenché
             if (item.getObjet() != null && item.getObjet().isAlreadyTriggered()) {
                 // Vérifier si l'item n'est pas déjà dans l'inventaire
-                if (!inventaire.contientItem(item.getName())) {
+                if (!inventaire.contientItem(item.getName()) && !inventaire.itemAEteRetire(item)) {
                     // Ajouter l'item à l'inventaire
                     inventaire.ajouterItem(item);
                     GameUtils.printDev("Item ajouté à l'inventaire: " + item.getName(), devMode);
@@ -525,5 +508,19 @@ public class GameController {
     
     public Animation getAnimation() {
         return animation;
+    }
+    
+    /**
+     * Réinitialise complètement l'état de l'animation
+     */
+    private void resetAnimation() {
+        // Forcer l'arrêt de l'animation en cours
+        animation.stop();
+        
+        // Créer une nouvelle instance d'animation pour remplacer l'ancienne
+        animation = new Animation(map);
+        
+        // Ajouter un message de débogage
+        GameUtils.printDev("Animation réinitialisée", devMode);
     }
 }

@@ -34,6 +34,6 @@ public class Item {
     public Objet getObjet() {return objet;}
     public void setObjet(Objet objet) { this.objet = objet; }
 
-    public Runnable getOnClick() { return onClick; }
-    public void setOnClick(Runnable onClick) { this.onClick = onClick; }
+    public Runnable getOnClick() {return onClick;}
+    public void setOnClick(Runnable onClick) {this.onClick = onClick;}
 }
