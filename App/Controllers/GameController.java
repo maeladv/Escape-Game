@@ -261,12 +261,20 @@ private void initializeJeux() {
             "Bravo! Vous avez réussi le mini-jeu de morpion !",
             "Vous pouvez continuer votre aventure dans la bibliothèque."
         };
-        dialogueManager.afficherScript(script, "Suivant");
-        // donner un objet (la clef)
-        Item clef = new Item("Clé", "Une clé qui ouvre la porte de la bibliothèque.", new java.io.File("assets/items/clef.png"), null);
-        inventaire.ajouterItem(clef);
-        GameUtils.printDev("Mini-jeu de morpion terminé avec succès ! Clé ajoutée à l'inventaire.", devMode);
-
+        dialogueManager.afficherScript(script, "Suivant", () -> {
+            // Donne la clé de la bibliothèque à la fin du morpion
+            for (Item item : allItems) {
+                if (item.getName().equals("Clé")) {
+                    if (!inventaire.contientItem(item.getName())) {
+                        inventaire.ajouterItem(item);
+                        GameUtils.printDev("Clé de la bibliothèque ajoutée à l'inventaire après le morpion.", devMode);
+                        updateInventaireUI();
+                    }
+                    break;
+                }
+            }
+        });
+        GameUtils.printDev("Mini-jeu de morpion terminé avec succès !", devMode);
     }
     )); // Ajoute le morpion comme mini-jeu
     
