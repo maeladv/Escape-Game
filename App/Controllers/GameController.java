@@ -130,7 +130,7 @@ public class GameController {
 
         // ajout d'un objet interactif pour un mini jeu Game
         objetsIntro.add(new Objet("objet interactif",
-            new Rectangle(100, 500, 50, 50), inventaire,
+            new Rectangle(100, 450, 50, 50), inventaire,
             () -> {
                 if (!jeux.isEmpty()) {
                     Game miniJeu = jeux.get(0); // Prendre le premier mini-jeu
@@ -256,7 +256,8 @@ public class GameController {
 // initialiser les mini-jeux disponibles
 private void initializeJeux() {
     jeux = new ArrayList<>();
-    jeux.add(new MorpionGame(devMode)); // Ajoute le morpion comme mini-jeu
+    jeux.add(new MorpionGame(devMode, dialogueManager)); // Ajoute le morpion comme mini-jeu
+    
 
 }
 

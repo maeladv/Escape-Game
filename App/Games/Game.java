@@ -1,6 +1,7 @@
 package App.Games;
 
 import App.Map.Map;
+import App.Dialogue.DialogueManager;
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,6 +13,8 @@ public abstract class Game {
     private boolean devMode;
     private boolean finished = false;
     private Runnable onCloseCallback;
+    protected DialogueManager dialogueManager;
+
 
     public Game(boolean devMode, String name, String description, String assetsFolder) {
         this.name = name;
@@ -20,21 +23,29 @@ public abstract class Game {
         this.devMode = devMode;
     }
 
+    public Game(boolean devMode, String name, String description, String assetsFolder, Runnable onCloseCallback) {
+        this(devMode, name, description, assetsFolder); // ON récupère le constructeur primaire
+        this.onCloseCallback = onCloseCallback;
+    }
+
+    public Game(boolean devMode, String name, String description, String assetsFolder, DialogueManager dialogueManager) {
+        this(devMode, name, description, assetsFolder);
+        this.dialogueManager = dialogueManager;
+    }
+
     // Getters
     public String getName() { return name; }
     public String getDescription() { return description; }
     public String getAssetsFolder() { return assetsFolder; }
     public boolean isFinished() { return finished; }
+    public DialogueManager getDialogueManager() { return dialogueManager; }
 
-    /**
-     * Affiche le mini-jeu dans la même fenêtre (superposé à la map), sans croix de fermeture.
-     * @param map la map sur laquelle ajouter le mini-jeu
-     */
+    // Affiche le mini-jeu dans la même fenêtre (superposé à la map)
     public void afficherMiniJeu(Map map) {
         if (miniJeuPanel != null) return;
         miniJeuPanel = getMainPanel();
         miniJeuPanel.setLayout(null);
-        miniJeuPanel.setBounds(0, 0, map.getWidth(), map.getHeight());
+        miniJeuPanel.setBounds(20, 20, map.getWidth() - 40, map.getHeight() - 40);
         // Ajout du bouton Redémarrer automatiquement pour tous les jeux
         JButton restartBtn = new JButton("Redémarrer");
         restartBtn.setFont(new Font("Arial", Font.BOLD, 16));
@@ -92,4 +103,5 @@ public abstract class Game {
         }
     }
     public void setOnCloseCallback(Runnable callback) { this.onCloseCallback = callback; }
+    public void setDialogueManager(DialogueManager dialogueManager) { this.dialogueManager = dialogueManager; }
 }
