@@ -26,7 +26,7 @@ Le jeu se se plongera dans un univers mysterieux et ensorcelé. Il était une fo
 
 ## Compilation et lancement du jeu
 
-`javac -d out App\*.java`
+`javac -d out -encoding utf8 App\*.java`
 
 `java -cp out App.Main`
 
