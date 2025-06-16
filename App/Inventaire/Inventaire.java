@@ -1,3 +1,4 @@
+package App.Inventaire;
 import java.util.ArrayList;
 
 public class Inventaire {
@@ -24,7 +25,7 @@ public class Inventaire {
 
     public boolean retirerItem(String itemName) {
         for (int i = 0; i < items.size(); i++) {
-            if (items.get(i).getNom().equals(itemName)) {
+            if (items.get(i).getName().equals(itemName)) {
                 items.remove(i);
                 return true; // Item retiré avec succès
             }
@@ -42,7 +43,7 @@ public class Inventaire {
     
     public boolean contientItem(String itemName) {
         for (Item item : items) {
-            if (item.getNom().equals(itemName)) {
+            if (item.getName().equals(itemName)) {
                 return true;
             }
         }
@@ -52,4 +53,8 @@ public class Inventaire {
     public boolean contientItem(Item item) {
         return items.contains(item);
     }
+
+    public void setItems(ArrayList<Item> items) { this.items = items; }
+    public int getCapacity() { return capacity; }
+    public void setCapacity(int capacity) { this.capacity = capacity; }
 }

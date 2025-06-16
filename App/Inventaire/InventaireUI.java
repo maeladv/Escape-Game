@@ -1,4 +1,8 @@
+package App.Inventaire;
 import javax.swing.*;
+
+import App.Dialogue.DialogueManager;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -27,7 +31,7 @@ public class InventaireUI extends JPanel {
         // Définir la taille préférée du panneau d'inventaire
         int width = cols * (slotSize + padding) + padding;
         // Augmenter légèrement la hauteur pour le texte en dessous des slots
-        int height = rows * (slotSize + padding) + padding + 10;
+        int height = rows * (slotSize + padding) + padding + 20;
         setPreferredSize(new Dimension(width, height));
         
         // Rendre le panneau transparent
@@ -50,9 +54,8 @@ public class InventaireUI extends JPanel {
                 if (index >= 0 && index < items.size()) {
                     Item selectedItem = items.get(index);
                     dialogueManager.afficherDialogue(
-                        selectedItem.getNom()+ " : "  + selectedItem.getDescription(),
-                        "OK",  // Texte du bouton
-                        null   // Pas d'action spécifique à exécuter à la fermeture
+                        selectedItem.getName()+ " : "  + selectedItem.getDescription(),
+                        "OK"  // Texte du bouton
                     );
                 }
             }
@@ -93,7 +96,7 @@ public class InventaireUI extends JPanel {
                 } catch (IOException e) {
                     // Utiliser l'image par défaut si l'image de l'item n'est pas disponible
                     itemImage = defaultImage;
-                    System.out.println("Utilisation de l'image par défaut pour : " + item.getNom());
+                    System.out.println("Utilisation de l'image par défaut pour : " + item.getName());
                 }
                 
                 if (itemImage != null) {
@@ -107,14 +110,14 @@ public class InventaireUI extends JPanel {
                     g.drawImage(itemImage, imgX, imgY, imgWidth, imgHeight, null);
                 }
             } catch (Exception e) {
-                System.out.println("Erreur lors du dessin de l'image pour " + item.getNom() + ": " + e.getMessage());
+                System.out.println("Erreur lors du dessin de l'image pour " + item.getName() + ": " + e.getMessage());
             }
             
             // Dessiner le nom de l'item
             g.setColor(Color.WHITE);
             g.setFont(new Font("Arial", Font.BOLD, 10));
             FontMetrics fm = g.getFontMetrics();
-            String name = item.getNom();
+            String name = item.getName();
             int textWidth = fm.stringWidth(name);
             
             if (textWidth > slotSize) {
@@ -140,8 +143,17 @@ public class InventaireUI extends JPanel {
         repaint();
     }
     
-    // Méthode pour définir le DialogueManager
-    public void setDialogueManager(DialogueManager dialogueManager) {
-        this.dialogueManager = dialogueManager;
-    }
+    // Getters et Setters pour chaque attribut d'instance
+    public Inventaire getInventaire() { return inventaire; }
+    public void setInventaire(Inventaire inventaire) { this.inventaire = inventaire; }
+    public int getSlotSize() { return slotSize; }
+    public void setSlotSize(int slotSize) { this.slotSize = slotSize; }
+    public int getPadding() { return padding; }
+    public void setPadding(int padding) { this.padding = padding; }
+    public int getRows() { return rows; }
+    public void setRows(int rows) { this.rows = rows; }
+    public BufferedImage getDefaultImage() { return defaultImage; }
+    public void setDefaultImage(BufferedImage defaultImage) { this.defaultImage = defaultImage; }
+    public DialogueManager getDialogueManager() { return dialogueManager; }
+    public void setDialogueManager(DialogueManager dialogueManager) { this.dialogueManager = dialogueManager; }
 }

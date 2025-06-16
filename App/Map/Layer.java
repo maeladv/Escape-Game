@@ -1,5 +1,8 @@
+package App.Map;
 import java.awt.Graphics;
 import java.util.ArrayList;
+
+import App.Utils.Drawable;
 
 public class Layer {
     private ArrayList<Drawable> elements;
@@ -20,5 +23,13 @@ public class Layer {
         for (Drawable element : elements) {
             element.draw(g);
         }
+    }
+
+    public ArrayList<Drawable> getElements() {
+        return elements;
+    }
+
+    public void setElements(ArrayList<Drawable> elements) {
+        this.elements = elements;
     }
 }
