@@ -19,7 +19,8 @@ import App.Games.Game;
 import App.Games.MorpionGame;
 
 /**
- * GameController centralizes game logic and coordinates between different components.
+ * GameController centralizes game logic and coordinates between different
+ * components.
  * This class is responsible for handling game state and managing interactions
  * between the player, map, inventory, and other game elements.
  */
@@ -33,7 +34,7 @@ public class GameController {
     private int playerSize;
     private int interactionZoneSize;
     private Animation animation; // Animation system
-    
+
     private int currentMapIndex = 0;
     private List<List<Objet>> objetsParMap;
     private List<List<Rectangle>> mursParMap;
@@ -41,8 +42,8 @@ public class GameController {
 
     private List<Game> jeux; // Liste des mini-jeux disponibles
 
-    public GameController(Map map, Joueur joueur, Inventaire inventaire, InventaireUI inventaireUI, 
-                         boolean devMode, int playerSize, int interactionZoneSize) {
+    public GameController(Map map, Joueur joueur, Inventaire inventaire, InventaireUI inventaireUI,
+            boolean devMode, int playerSize, int interactionZoneSize) {
         this.map = map;
         this.joueur = joueur;
         this.inventaire = inventaire;
@@ -50,33 +51,33 @@ public class GameController {
         this.devMode = devMode;
         this.playerSize = playerSize;
         this.interactionZoneSize = interactionZoneSize;
-        
+
         // Initialize the animation system
         this.animation = new Animation(map);
-        
+
         // Initialize collections
         this.objetsParMap = new ArrayList<>();
         this.mursParMap = new ArrayList<>();
         this.allItems = new ArrayList<>();
-        
+
         // Create the DialogueManager with a reference to the player
         this.dialogueManager = new DialogueManager(map, joueur);
-        
+
         // Set the DialogueManager to the InventaireUI
         this.inventaireUI.setDialogueManager(dialogueManager);
-        
+
         // Initialiser les mini jeux disponibles
         initializeJeux();
 
         // Initialize the maps and objects
         initializeMapsAndObjects();
-        
+
         // Show intro script if starting with the first map
         if (currentMapIndex == 0) {
             showIntroScript();
         }
     }
-    
+
     /**
      * Initialize the maps and objects for the game
      */
@@ -84,8 +85,8 @@ public class GameController {
         // Initialize walls for map 0 (Introduction)
         List<Rectangle> mursIntro = new ArrayList<>();
         // bords de la map
-        mursIntro.add(new Rectangle (-20, 0, 20, map.getHeightValue()));
-        mursIntro.add(new Rectangle (0, -20, map.getWidthValue(), 20));
+        mursIntro.add(new Rectangle(-20, 0, 20, map.getHeightValue()));
+        mursIntro.add(new Rectangle(0, -20, map.getWidthValue(), 20));
         mursIntro.add(new Rectangle(map.getWidthValue(), 0, 10, map.getHeightValue()));
         mursIntro.add(new Rectangle(0, map.getHeightValue(), map.getWidthValue(), 20));
         // limite chemin supérieure
@@ -96,72 +97,72 @@ public class GameController {
         mursIntro.add(new Rectangle(520, 300, 120, 100));
         // suite porte à droite
         mursIntro.add(new Rectangle(640, 340, 200, 100));
-        
+
         mursParMap.add(mursIntro);
 
         // Initialize objects for map 0 (Introduction)
         List<Objet> objetsIntro = new ArrayList<>();
 
         Objet cle = new Objet("cle",
-            new Rectangle(780, 500, 20, 20), inventaire,
-            () -> {
-                dialogueManager.afficherDialogue(
-                    "Vous avez trouvé une clé ! Elle pourrait être utile pour ouvrir des portes.",
-                    "OK");
-            }
-        );
+                new Rectangle(780, 500, 20, 20), inventaire,
+                () -> {
+                    dialogueManager.afficherDialogue(
+                            "Vous avez trouvé une clé ! Elle pourrait être utile pour ouvrir des portes.",
+                            "OK");
+                });
         objetsIntro.add(cle);
 
-        Item itemCle = new Item("Clé", "Une clé rouillée qui semble ancienne.", new java.io.File("assets/items/clef.png"), cle);
+        Item itemCle = new Item("Clé", "Une clé rouillée qui semble ancienne.",
+                new java.io.File("assets/items/clef.png"), cle);
         allItems.add(itemCle);
-        
+
         // Door object that changes map when interacted with
         objetsIntro.add(new Objet("porte d'entrée",
-            new Rectangle(540, 310, 70, 110), inventaire, itemCle,
-            () -> {
-                
-                // Démarrer l'animation de fade out avant de changer de map
-                animation.startFadeOut(500, (Void v) -> {
-                    changeMap(1);
-                    GameUtils.printDev("Interaction avec la porte de la map 0 ! Changement de map.", devMode);
-                });
-                joueur.setPosition(50, 530);
-                joueur.setState(1);
-            },
-            () -> {
-                dialogueManager.afficherDialogue(
-                    "Vous avez besoin d'une clé pour ouvrir cette porte.",
-                    "OK"
-                );
-            }
-        ));
+                new Rectangle(540, 310, 70, 110), inventaire, itemCle,
+                () -> {
+
+                    // Démarrer l'animation de fade out avant de changer de map
+                    animation.startFadeOut(500, (Void v) -> {
+                        changeMap(1);
+                        GameUtils.printDev("Interaction avec la porte de la map 0 ! Changement de map.", devMode);
+                    });
+                    joueur.setPosition(50, 530);
+                    joueur.setState(1);
+                },
+                () -> {
+                    String[] messages = {
+                            "Vous avez besoin d'une clef pour ouvrir cette porte.",
+                            "Peut-être qu'un garde a laissé un double derrière un buisson ?"
+                    };
+                    dialogueManager.afficherScript(
+                            messages, "OK");
+                }));
 
         // ajout d'un objet interactif pour un mini jeu Game
         objetsIntro.add(new Objet("objet interactif",
-            new Rectangle(100, 450, 50, 50), inventaire,
-            () -> {
-                if (!jeux.isEmpty()) {
-                    Game miniJeu = jeux.get(0); // Prendre le premier mini-jeu
-                    GameUtils.printDev("Lancement du mini-jeu: " + miniJeu.getName(), devMode);
-                    miniJeu.afficherMiniJeu(map); // Affiche le mini-jeu dans la même fenêtre
-                } else {
-                    dialogueManager.afficherDialogue(
-                        "Aucun mini-jeu disponible pour le moment.",
-                        "OK"
-                    );
-                }
-            }
-        ));
-        
+                new Rectangle(100, 450, 50, 50), inventaire,
+                () -> {
+                    if (!jeux.isEmpty()) {
+                        Game miniJeu = jeux.get(0); // Prendre le premier mini-jeu
+                        GameUtils.printDev("Lancement du mini-jeu: " + miniJeu.getName(), devMode);
+                        miniJeu.afficherMiniJeu(map); // Affiche le mini-jeu dans la même fenêtre
+                    } else {
+                        dialogueManager.afficherDialogue(
+                                "Aucun mini-jeu disponible pour le moment.",
+                                "OK");
+                    }
+                }));
+
         objetsParMap.add(objetsIntro);
-        
+
         // Ajouter un élément drawable pour afficher les informations de debug
         if (devMode) {
             map.addDebugLayerElement(new Drawable() {
                 @Override
                 public void draw(Graphics g) {
                     if (devMode && currentMapIndex < mursParMap.size() && currentMapIndex < objetsParMap.size()) {
-                        GameUtils.drawDebugRectangles(g, mursParMap.get(currentMapIndex), objetsParMap.get(currentMapIndex), devMode);
+                        GameUtils.drawDebugRectangles(g, mursParMap.get(currentMapIndex),
+                                objetsParMap.get(currentMapIndex), devMode);
                     }
                 }
             });
@@ -170,8 +171,8 @@ public class GameController {
         // Initialize walls for map 1 (Library)
         List<Rectangle> mursBibliotheque = new ArrayList<>();
         // bords de la map
-        mursBibliotheque.add(new Rectangle (-20, 0, 20, map.getHeightValue()));
-        mursBibliotheque.add(new Rectangle (0, -20, map.getWidthValue(), 20));
+        mursBibliotheque.add(new Rectangle(-20, 0, 20, map.getHeightValue()));
+        mursBibliotheque.add(new Rectangle(0, -20, map.getWidthValue(), 20));
         mursBibliotheque.add(new Rectangle(map.getWidthValue() - 15, 0, 10, map.getHeightValue()));
         mursBibliotheque.add(new Rectangle(0, map.getHeightValue(), map.getWidthValue(), 20));
         // mur bas gauche
@@ -202,60 +203,135 @@ public class GameController {
         // tables
         mursBibliotheque.add(new Rectangle(200, 355, 35, 30));
         mursBibliotheque.add(new Rectangle(600, 515, 45, 20));
-        
+
         mursParMap.add(mursBibliotheque);
 
-        // Initialize objects for map 1 (Library)
+        // Initialiser les objets de la map1 (Bibliothèque)
         List<Objet> objetsBibliotheque = new ArrayList<>();
-        
 
-        // Bookshelf with multi-step dialogue
+        // Première bibliothèque (entrée)
         Objet bibliothequeEntree = new Objet("bibliothèque entree",
-            new Rectangle(70, 480, 50, 20), inventaire,
-            () -> {
-                String[] messages = {
-                    "Ah! Il semblerait que l'on puisse interagir avec ces bibliotheques.",
-                    "Ce vieux batiment est donc une bibliotheque.",
-                    "Elle me semble très ancienne et poussiereuse. Certains murs tombent meme en ruines !",
-                    "On dirait qu'elle n'a pas ete utilisee depuis des annees.",
-                    "Peut-etre que quelqu'un a laisse un message ici ?",
-                    "Il y a des livres sur les etageres, mais certaines sont encore trop poussiereuses pour etre ouvertes."
-                };
-                dialogueManager.afficherScript(messages, "Suivant");
-            }
-        );
+                new Rectangle(70, 480, 50, 20), inventaire,
+                () -> {
+                    String[] messages = {
+                            "Ah! Il semblerait que l'on puisse interagir avec ces bibliotheques.",
+                            "Ce vieux bâtiment est donc une bibliothèque.",
+                            "Elle me semble très ancienne et poussiereuse. Certains murs tombent même en ruines !",
+                            "On dirait qu'elle n'a pas ete utilisée depuis des années.",
+                            "Peut-être que quelqu'un a laissé un message ici ?",
+                            "Il y a des livres sur les etagères, mais certaines sont encore trop poussiereuses pour etre ouvertes.",
+                            "Oh, je viens de trouver un balai !"
+                    };
+                    dialogueManager.afficherScript(messages, "Suivant");
+                });
         objetsBibliotheque.add(bibliothequeEntree);
-        
-        
+
+        // 2ème bibliothèque (informations sur le sorcier - parchemin)
+
+        // item balai
+        Item balai = new Item("Balai", "Un balai. Me demande-t-on faire le ménage !? Quel culot !",
+                new java.io.File("assets/items/balai.png"), bibliothequeEntree);
+        // Ajouter l'item à la liste globale des items
+        allItems.add(balai);
+
+        Objet bibliothequeSorcier = new Objet("bibliothèque sorcier",
+                new Rectangle(0, 480, 40, 20), inventaire,
+                balai,
+                () -> {
+                    String[] messages = {
+                            "Ahh ! Cela fait du bien de nettoyer un peu ! Je peux enfin y voir plus clair !",
+                            "Voyons, voir il semblerait y avoir un parchemin ici. Il est encore lisible !",
+                            "Voyons voir ce qu'il y a dessus !",
+                            "Mais il ne semble pas écrit en français...",
+                            "Enfin, je ne parviens pas bien à voir ce qu'il y a dessus. Il me faudrait un peu plus de lumière.",
+                    };
+                    dialogueManager.afficherScript(messages, "Suivant");
+                },
+                () -> {
+                    String[] messages = {
+                            "MMhh, il y a quelque chose ici, mais je ne parviens pas à voir ce que c'est...",
+                            "PIl y a trop de poussière, il faudrait que je nettoie un peu.",
+                    };
+                    dialogueManager.afficherScript(messages, "OK");
+                });
+        // Ajouter l'objet de la bibliothèque à la liste des objets de la map
+        objetsBibliotheque.add(bibliothequeSorcier);
+
+        // Ajouter l'objet de la bibliothèque à la liste des objets de la map
         objetsParMap.add(objetsBibliotheque);
 
-        Item livre = new Item("Livre ancien", "Un livre poussiéré qui semble très ancien.", new java.io.File("assets/items/livre.png"), bibliothequeEntree);
+        Item parchemin = new Item("Parchemin",
+                "Un vieux parchemin à déchiffrer. Impossible de l'étudier dans un coin sombre, il faut trouver un endroit calme et éclairé.",
+                new java.io.File("assets/items/livre.png"), bibliothequeSorcier,
+                () -> {
+                    // Action à exécuter lorsque l'item est cliqué
+                    dialogueManager.afficherDialogue(
+                            "Vous avez trouvé un parchemin ! Il semble ancien et difficile à lire.",
+                            "OK",
+                            () -> {
+                                // Réactiver le mouvement du joueur après la lecture
+                                joueur.setCanMove(true);
+                            });
+                });
         // Ajouter l'item à la liste globale des items
-        allItems.add(livre);
+        allItems.add(parchemin);
+
+        // Table n°1 de la bibliothèque
+        Objet tableBibliotheque1 = new Objet("table de la bibliothèque 1",
+                new Rectangle(200, 350, 40, 30), inventaire, parchemin,
+                () -> {
+                    String[] messages = {
+                            "Cette table est plus propre que le reste de la bibliothèque. On dirait que quelqu'un s'est assis ici récemment.",
+                            "La bougie est encore allumée, c'est étrange.",
+                            "Je peux m'installer ici pour étudier le parchemin !"
+                    };
+                    dialogueManager.afficherScript(
+                            messages,
+                            "OK",
+                            () -> joueur.setCanMove(true));
+                    // lancer le mini jeu 2 après validation du dialogue
+                    dialogueManager.afficherDialogue(
+                            "Mais il ne semble pas écrit en français... Essayons de le déchiffer", "C'est parti",
+                            () -> {
+                                // Lancer le mini-jeu 2
+                                if (!jeux.isEmpty()) {
+                                    Game miniJeu = jeux.get(0); // Prendre le 2ème mini-jeu
+                                    GameUtils.printDev("Lancement du mini-jeu: " + miniJeu.getName(), devMode);
+                                    miniJeu.afficherMiniJeu(map); // Affiche le mini-jeu dans la même fenêtre
+                                } else {
+                                    dialogueManager.afficherDialogue(
+                                            "Aucun mini-jeu disponible pour le moment.",
+                                            "OK");
+                                }
+                            });
+
+                },
+                () -> dialogueManager.afficherDialogue(
+                        "Mmmh, c'est étrange, la bougie de cette table est encore allumée...",
+                        "Fermer",
+                        () -> joueur.setCanMove(true)));
+
+        objetsBibliotheque.add(tableBibliotheque1);
 
         // Table with dialogue
         Objet tableBibliotheque = new Objet("table de la bibliothèque",
-            new Rectangle(600, 510, 50, 20), inventaire, livre,
-            () -> dialogueManager.afficherDialogue(
-                "Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.", 
-                "OK", 
-                () -> joueur.setCanMove(true)
-            ),
-            () -> dialogueManager.afficherDialogue(
-                "Trouver le livre pour interagir. Appuyez sur OK pour continuer.", 
-                "OK", 
-                () -> joueur.setCanMove(true)
-            )
-        );
+                new Rectangle(600, 510, 50, 20), inventaire, parchemin,
+                () -> dialogueManager.afficherDialogue(
+                        "Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.",
+                        "OK",
+                        () -> joueur.setCanMove(true)),
+                () -> dialogueManager.afficherDialogue(
+                        "Trouver le livre pour interagir. Appuyez sur OK pour continuer.",
+                        "OK",
+                        () -> joueur.setCanMove(true)));
         objetsBibliotheque.add(tableBibliotheque);
 
-
         // Créer d'abord l'item sans l'action
-        Item potionItem = new Item("Potion de téléportation", 
-            "Vous allez être téléporter.", 
-            new java.io.File("assets/items/potion.png"), 
-            tableBibliotheque);
-            
+        Item potionItem = new Item("Potion de téléportation",
+                "Vous allez être téléporter.",
+                new java.io.File("assets/items/potion.png"),
+                tableBibliotheque);
+
         // Définir l'action après la création de l'item
         potionItem.setOnClick(() -> {
             // Téléporter le joueur à un autre endroit de la map avec animation
@@ -264,83 +340,66 @@ public class GameController {
         });
 
         allItems.add(potionItem);
-        
+
         // Set initial map's walls to Map class
         map.setMurs(new ArrayList<>(mursParMap.get(currentMapIndex)));
     }
 
-
-// initialiser les mini-jeux disponibles
-private void initializeJeux() {
-    jeux = new ArrayList<>();
-    jeux.add(new MorpionGame(devMode, dialogueManager, () -> {
-        String[] script= {
-            "Bravo! Vous avez réussi le mini-jeu de morpion !",
-            "Vous pouvez continuer votre aventure dans la bibliothèque."
-        };
-        dialogueManager.afficherScript(script, "Suivant", () -> {
-            // Donne la clé de la bibliothèque à la fin du morpion
-            for (Item item : allItems) {
-                if (item.getName().equals("Clé")) {
-                    if (!inventaire.contientItem(item.getName())) {
-                        inventaire.ajouterItem(item);
-                        GameUtils.printDev("Clé de la bibliothèque ajoutée à l'inventaire après le morpion.", devMode);
-                        updateInventaireUI();
+    // initialiser les mini-jeux disponibles
+    private void initializeJeux() {
+        jeux = new ArrayList<>();
+        jeux.add(new MorpionGame(devMode, dialogueManager, () -> {
+            String[] script = {
+                    "Bravo! Vous avez réussi le mini-jeu de morpion !",
+                    "Vous pouvez continuer votre aventure dans la bibliothèque."
+            };
+            dialogueManager.afficherScript(script, "Suivant", () -> {
+                // Donne la clé de la bibliothèque à la fin du morpion
+                for (Item item : allItems) {
+                    if (item.getName().equals("Clé")) {
+                        if (!inventaire.contientItem(item.getName())) {
+                            inventaire.ajouterItem(item);
+                            GameUtils.printDev("Clé de la bibliothèque ajoutée à l'inventaire après le morpion.",
+                                    devMode);
+                            updateInventaireUI();
+                        }
+                        break;
                     }
-                    break;
                 }
-            }
-        });
-        GameUtils.printDev("Mini-jeu de morpion terminé avec succès !", devMode);
+            });
+            GameUtils.printDev("Mini-jeu de morpion terminé avec succès !", devMode);
+        })); // Ajoute le morpion comme mini-jeu
+
     }
-    )); // Ajoute le morpion comme mini-jeu
-    
 
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
     /**
      * Display the introduction script
      */
     private void showIntroScript() {
         String[] introScript = {
-            "Bienvenue dans Escape From The Biblioteca !", 
-            "Que voit-on au loin ? Une coline ? Un vieux village ?",
-            "Je ne sais pas, cette foret est si sombre et si dense...",
-            "Et que voici par ici ? Un vieux batiment ? Peut-etre un chateau abandonne ?",
-            "Enfin, c'est etrange, il n'y a pas un bruit et des torches sont encore allumees !",
-            "On pourrait croire que quelqu'un vit encore ici...",
-            "Cette foret ne m'inspire pas confiance mais... le temps semble s'y etre fige.",
-            "La nuit tombe, je n'ai d'autre choix que d'entrer dans ce batiment.",
+                "Bienvenue dans Escape From The Biblioteca !",
+                "Que voit-on au loin ? Une coline ? Un vieux village ?",
+                "Je ne sais pas, cette foret est si sombre et si dense...",
+                "Et que voici par ici ? Un vieux batiment ? Peut-etre un chateau abandonne ?",
+                "Enfin, c'est etrange, il n'y a pas un bruit et des torches sont encore allumees !",
+                "On pourrait croire que quelqu'un vit encore ici...",
+                "Cette foret ne m'inspire pas confiance mais... le temps semble s'y etre fige.",
+                "La nuit tombe, je n'ai d'autre choix que d'entrer dans ce batiment.",
         };
-        
+
         // Show the introduction script
         // Utiliser un Timer pour s'assurer que l'interface est complètement initialisée
         javax.swing.Timer timer = new javax.swing.Timer(500, e -> {
-            ((javax.swing.Timer)e.getSource()).stop();
+            ((javax.swing.Timer) e.getSource()).stop();
             dialogueManager.afficherScript(introScript, "Suivant");
         });
         timer.setRepeats(false);
         timer.start();
     }
-    
+
     /**
      * Change the current map
+     * 
      * @param mapIndex The index of the map to change to
      */
     public void changeMap(int mapIndex) {
@@ -348,14 +407,14 @@ private void initializeJeux() {
         if (animation.isRunning()) {
             return;
         }
-        
+
         // Démarrer l'animation de fade out
         animation.startFadeOut(500, (Void v) -> {
             // Cette partie s'exécute après la fin du fade out
             currentMapIndex = mapIndex;
             map.setDisplayedMap(mapIndex);
             map.setMurs(new ArrayList<>(mursParMap.get(mapIndex)));
-            
+
             // Mettre à jour l'élément de débogage pour la nouvelle carte
             if (devMode) {
                 // Supprimer l'ancien élément de débogage et en ajouter un nouveau
@@ -364,15 +423,16 @@ private void initializeJeux() {
                     @Override
                     public void draw(Graphics g) {
                         if (devMode && currentMapIndex < mursParMap.size() && currentMapIndex < objetsParMap.size()) {
-                            GameUtils.drawDebugRectangles(g, mursParMap.get(currentMapIndex), objetsParMap.get(currentMapIndex), devMode);
+                            GameUtils.drawDebugRectangles(g, mursParMap.get(currentMapIndex),
+                                    objetsParMap.get(currentMapIndex), devMode);
                         }
                     }
                 });
             }
-            
+
             // Mettre à jour l'inventaire après changement de carte
             ajouterItemsInventaire();
-            
+
             // Démarrer l'animation de fade in
             animation.startFadeIn(500, (Void v2) -> {
                 // Réactiver les mouvements du joueur après la fin de l'animation
@@ -380,24 +440,25 @@ private void initializeJeux() {
             });
         });
     }
-    
+
     /**
      * Téléporte le joueur à une nouvelle position avec une animation
-     * @param x La nouvelle position X du joueur
-     * @param y La nouvelle position Y du joueur
+     * 
+     * @param x     La nouvelle position X du joueur
+     * @param y     La nouvelle position Y du joueur
      * @param state L'orientation du joueur après téléportation
      */
     public void teleportPlayer(int x, int y, int state) {
         GameUtils.printDev("État de l'animation avant téléportation: " + animation.isRunning(), devMode);
-        
+
         // Réinitialiser complètement l'animation pour éviter les problèmes
         resetAnimation();
-        
+
         GameUtils.printDev("Téléportation du joueur vers (" + x + ", " + y + ") avec état " + state, devMode);
 
         // Empêcher le joueur de bouger pendant l'animation
         joueur.setCanMove(false);
-        
+
         // Démarrer l'animation de téléportation
         animation.startTeleport(joueur.getX(), joueur.getY(), playerSize, 1000, (Void v) -> {
             // Déplacer le joueur après l'animation
@@ -407,12 +468,13 @@ private void initializeJeux() {
             joueur.setCanMove(true);
         });
     }
-    
+
     /**
      * Check if there is a collision at the given position
-     * @param x X position to check
-     * @param y Y position to check
-     * @param width Width of the bounding box
+     * 
+     * @param x      X position to check
+     * @param y      Y position to check
+     * @param width  Width of the bounding box
      * @param height Height of the bounding box
      * @return true if there is a collision, false otherwise
      */
@@ -425,17 +487,17 @@ private void initializeJeux() {
         }
         return false;
     }
-    
+
     /**
      * Check for object interactions based on player position and state
+     * 
      * @param pressedA True if the 'A' key is pressed
      */
     public void checkObjectInteractions(boolean pressedA) {
         // Create interaction zone around player using utility method
         Rectangle zoneInteraction = GameUtils.createInteractionZone(
-            joueur.getX(), joueur.getY(), playerSize, interactionZoneSize
-        );
-        
+                joueur.getX(), joueur.getY(), playerSize, interactionZoneSize);
+
         // Check all objects in the current map
         for (Objet obj : objetsParMap.get(currentMapIndex)) {
             if (zoneInteraction.intersects(obj.getHitbox())) {
@@ -444,19 +506,19 @@ private void initializeJeux() {
                 int centreObjetY = obj.getHitbox().y + obj.getHitbox().height / 2;
                 int centreJoueurX = joueur.getX() + playerSize / 2;
                 int centreJoueurY = joueur.getY() + playerSize / 2;
-                
+
                 // Check if player is facing the object using the utility method
                 boolean regardeBonneDirection = GameUtils.playerFacingObject(
-                    centreJoueurX, centreJoueurY, centreObjetX, centreObjetY, joueur.getState()
-                );
-                
+                        centreJoueurX, centreJoueurY, centreObjetX, centreObjetY, joueur.getState());
+
                 // Set object active state based on whether player is facing it
                 obj.setActive(regardeBonneDirection);
-                
+
                 if (devMode && regardeBonneDirection) {
-                    GameUtils.printDev("Objet interactif à proximité immédiate. Appuyez sur 'A' pour interagir.", devMode);
+                    GameUtils.printDev("Objet interactif à proximité immédiate. Appuyez sur 'A' pour interagir.",
+                            devMode);
                 }
-                
+
                 // Trigger the object if 'A' is pressed and player is facing it
                 if (pressedA && regardeBonneDirection) {
                     obj.trigger();
@@ -471,15 +533,16 @@ private void initializeJeux() {
             }
         }
     }
-    
+
     /**
      * Check for direct object collisions (touching objects)
+     * 
      * @param pressedA True if the 'A' key is pressed
      */
     public void checkDirectObjectCollisions(boolean pressedA) {
         // Create player hitbox
         Rectangle joueurBox = new Rectangle(joueur.getX(), joueur.getY(), playerSize, playerSize);
-        
+
         // Check all objects in the current map
         for (Objet obj : objetsParMap.get(currentMapIndex)) {
             if (joueurBox.intersects(obj.getHitbox()) && pressedA) {
@@ -490,8 +553,6 @@ private void initializeJeux() {
             }
         }
     }
-
-
 
     // ajouter les items de la map à l'inventaire
     public void ajouterItemsInventaire() {
@@ -520,7 +581,8 @@ private void initializeJeux() {
                     // Supprimer l'item de l'inventaire
                     if (inventaire.contientItem(obj.getItemToInteract())) {
                         inventaire.retirerItem(obj.getItemToInteract());
-                        GameUtils.printDev("Item supprimé de l'inventaire: " + obj.getItemToInteract().getName(), devMode);
+                        GameUtils.printDev("Item supprimé de l'inventaire: " + obj.getItemToInteract().getName(),
+                                devMode);
                     }
                 }
             }
@@ -536,59 +598,58 @@ private void initializeJeux() {
         inventaireUI.updateInventaire(inventaire);
     }
 
-
     // Les getters et setters ont été regroupés à la fin
-    
+
     public Map getMap() {
         return map;
     }
-    
+
     public Joueur getJoueur() {
         return joueur;
     }
-    
+
     public DialogueManager getDialogueManager() {
         return dialogueManager;
     }
-    
+
     public List<List<Objet>> getObjetsParMap() {
         return objetsParMap;
     }
-    
+
     public int getCurrentMapIndex() {
         return currentMapIndex;
     }
-    
+
     public boolean isDevMode() {
         return devMode;
     }
-    
+
     public void setDevMode(boolean devMode) {
         this.devMode = devMode;
     }
-    
+
     public int getPlayerSize() {
         return playerSize;
     }
-    
+
     public int getInteractionZoneSize() {
         return interactionZoneSize;
     }
-    
+
     public Animation getAnimation() {
         return animation;
     }
-    
+
     /**
      * Réinitialise complètement l'état de l'animation
      */
     private void resetAnimation() {
         // Forcer l'arrêt de l'animation en cours
         animation.stop();
-        
+
         // Créer une nouvelle instance d'animation pour remplacer l'ancienne
         animation = new Animation(map);
-        
+
         // Ajouter un message de débogage
         GameUtils.printDev("Animation réinitialisée", devMode);
     }
