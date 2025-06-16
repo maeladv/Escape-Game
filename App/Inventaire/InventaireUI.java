@@ -63,7 +63,15 @@ public class InventaireUI extends JPanel {
                     Item selectedItem = items.get(index);
                     dialogueManager.afficherDialogue(
                         selectedItem.getName()+ " : "  + selectedItem.getDescription(),
-                        "OK"  // Texte du bouton
+                        "OK",  // Texte du bouton
+                        () -> {
+                            // Exécuter l'action associée à l'item si elle existe
+                            if (selectedItem.getOnClick() != null) {
+                                selectedItem.getOnClick().run();
+                            } else {
+                                GameUtils.printDev("Aucune action définie pour l'item : " + selectedItem.getName(), devMode);
+                            }
+                        }
                     );
                 }
             }
