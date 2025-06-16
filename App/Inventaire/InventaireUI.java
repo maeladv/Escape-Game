@@ -29,7 +29,7 @@ public class InventaireUI extends JPanel {
         
         try {
             // Charger une image par défaut pour les items sans image
-            defaultImage = ImageIO.read(new java.io.File("assets/joueur/droite.png"));
+            defaultImage = ImageIO.read(new java.io.File("assets/assets/default.png"));
         } catch (IOException e) {
             GameUtils.printDev("Erreur lors du chargement de l'image par défaut : " + e.getMessage(), devMode);
         }

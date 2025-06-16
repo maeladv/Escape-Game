@@ -78,11 +78,6 @@ public class Main {
 
     // fonction principale
     public static void main(String[] args) {
-        // Créer un dossier "objets" s'il n'existe pas
-        File objetsDir = new File("assets/objets");
-        if (!objetsDir.exists()) {
-            objetsDir.mkdirs();
-        }
         
         // Exécuter l'initialisation de la fenêtre dans l'EDT (Event Dispatch Thread)
         SwingUtilities.invokeLater(() -> {
