@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
+import App.Animation.Animation;
 import App.Dialogue.DialogueManager;
 import App.Inventaire.Inventaire;
 import App.Inventaire.InventaireUI;
@@ -29,6 +30,7 @@ public class GameController {
     private boolean devMode;
     private int playerSize;
     private int interactionZoneSize;
+    private Animation animation; // Animation system
     
     private int currentMapIndex = 0;
     private List<List<Objet>> objetsParMap;
@@ -44,6 +46,9 @@ public class GameController {
         this.devMode = devMode;
         this.playerSize = playerSize;
         this.interactionZoneSize = interactionZoneSize;
+        
+        // Initialize the animation system
+        this.animation = new Animation(map);
         
         // Initialize collections
         this.objetsParMap = new ArrayList<>();
@@ -107,11 +112,14 @@ public class GameController {
         objetsIntro.add(new Objet("porte d'entrée",
             new Rectangle(540, 310, 70, 110), inventaire, itemCle,
             () -> {
-                changeMap(1);
-                GameUtils.printDev("Interaction avec la porte de la map 0 ! Changement de map.", devMode);
+                
+                // Démarrer l'animation de fade out avant de changer de map
+                animation.startFadeOut(500, (Void v) -> {
+                    changeMap(1);
+                    GameUtils.printDev("Interaction avec la porte de la map 0 ! Changement de map.", devMode);
+                });
                 joueur.setPosition(50, 530);
                 joueur.setState(1);
-                map.repaint();
             },
             () -> {
                 dialogueManager.afficherDialogue(
@@ -194,6 +202,33 @@ public class GameController {
         );
         objetsBibliotheque.add(bibliothequeEntree);
         
+        // Ajout d'une potion de téléportation
+        Objet potionObjet = new Objet("potion de téléportation",
+            new Rectangle(450, 400, 30, 30), inventaire,
+            () -> {
+                dialogueManager.afficherDialogue(
+                    "Vous avez trouvé une potion de téléportation ! Elle semble magique et pourrait vous permettre de vous déplacer instantanément.",
+                    "OK"
+                );
+            }
+        );
+        objetsBibliotheque.add(potionObjet);
+        
+        Item potionItem = new Item("Potion de téléportation", 
+            "Une potion mystérieuse qui permet de se téléporter.", 
+            new java.io.File("assets/items/potion.png"), 
+            potionObjet, 
+            () -> {
+                // Téléporter le joueur à un autre endroit de la map avec animation
+                teleportPlayer(600, 350, 1);
+                dialogueManager.afficherDialogue(
+                    "Vous vous êtes téléporté ! La potion s'est consommée.",
+                    "OK"
+                );
+            }
+        );
+        allItems.add(potionItem);
+        
         objetsParMap.add(objetsBibliotheque);
 
         Item livre = new Item("Livre ancien", "Un livre poussiéreux qui semble très ancien.", new java.io.File("assets/items/livre.png"), bibliothequeEntree);
@@ -258,26 +293,67 @@ public class GameController {
      * @param mapIndex The index of the map to change to
      */
     public void changeMap(int mapIndex) {
-        currentMapIndex = mapIndex;
-        map.setDisplayedMap(mapIndex);
-        map.setMurs(new ArrayList<>(mursParMap.get(mapIndex)));
-        
-        // Mettre à jour l'élément de débogage pour la nouvelle carte
-        if (devMode) {
-            // Supprimer l'ancien élément de débogage et en ajouter un nouveau
-            map.clearDebugLayer();
-            map.addDebugLayerElement(new Drawable() {
-                @Override
-                public void draw(Graphics g) {
-                    if (devMode && currentMapIndex < mursParMap.size() && currentMapIndex < objetsParMap.size()) {
-                        GameUtils.drawDebugRectangles(g, mursParMap.get(currentMapIndex), objetsParMap.get(currentMapIndex), devMode);
-                    }
-                }
-            });
+        // Si une animation est déjà en cours, ne rien faire
+        if (animation.isRunning()) {
+            return;
         }
         
-        // Mettre à jour l'inventaire après changement de carte
-        ajouterItemsInventaire();
+        // Démarrer l'animation de fade out
+        animation.startFadeOut(500, (Void v) -> {
+            // Cette partie s'exécute après la fin du fade out
+            currentMapIndex = mapIndex;
+            map.setDisplayedMap(mapIndex);
+            map.setMurs(new ArrayList<>(mursParMap.get(mapIndex)));
+            
+            // Mettre à jour l'élément de débogage pour la nouvelle carte
+            if (devMode) {
+                // Supprimer l'ancien élément de débogage et en ajouter un nouveau
+                map.clearDebugLayer();
+                map.addDebugLayerElement(new Drawable() {
+                    @Override
+                    public void draw(Graphics g) {
+                        if (devMode && currentMapIndex < mursParMap.size() && currentMapIndex < objetsParMap.size()) {
+                            GameUtils.drawDebugRectangles(g, mursParMap.get(currentMapIndex), objetsParMap.get(currentMapIndex), devMode);
+                        }
+                    }
+                });
+            }
+            
+            // Mettre à jour l'inventaire après changement de carte
+            ajouterItemsInventaire();
+            
+            // Démarrer l'animation de fade in
+            animation.startFadeIn(500, (Void v2) -> {
+                // Réactiver les mouvements du joueur après la fin de l'animation
+                joueur.setCanMove(true);
+            });
+        });
+    }
+    
+    /**
+     * Téléporte le joueur à une nouvelle position avec une animation
+     * @param x La nouvelle position X du joueur
+     * @param y La nouvelle position Y du joueur
+     * @param state L'orientation du joueur après téléportation
+     */
+    public void teleportPlayer(int x, int y, int state) {
+        // Si une animation est déjà en cours, ne rien faire
+        if (animation.isRunning()) {
+            return;
+        }
+        
+        // Désactiver temporairement les mouvements du joueur
+        joueur.setCanMove(false);
+        
+        // Démarrer l'animation de téléportation
+        animation.startTeleport(joueur.getX(), joueur.getY(), playerSize, 1000, (Void v) -> {
+            // Déplacer le joueur après l'animation
+            joueur.setPosition(x, y);
+            joueur.setState(state);
+            
+            // Réactiver les mouvements du joueur
+            joueur.setCanMove(true);
+        });
     }
     
     /**
@@ -445,5 +521,9 @@ public class GameController {
     
     public int getInteractionZoneSize() {
         return interactionZoneSize;
+    }
+    
+    public Animation getAnimation() {
+        return animation;
     }
 }
