@@ -17,6 +17,7 @@ import App.Utils.Drawable;
 import App.Utils.GameUtils;
 import App.Games.Game;
 import App.Games.MorpionGame;
+import App.Games.ParcheminGame;
 
 /**
  * GameController centralizes game logic and coordinates between different
@@ -35,7 +36,7 @@ public class GameController {
     private int interactionZoneSize;
     private Animation animation; // Animation system
 
-    private int currentMapIndex = 0;
+    private int currentMapIndex;
     private List<List<Objet>> objetsParMap;
     private List<List<Rectangle>> mursParMap;
     private List<Item> allItems; // Liste de tous les items disponibles dans le jeu
@@ -65,6 +66,9 @@ public class GameController {
 
         // Set the DialogueManager to the InventaireUI
         this.inventaireUI.setDialogueManager(dialogueManager);
+
+        // Synchronise currentMapIndex et displayedMap
+        this.currentMapIndex = map.getDisplayedMap();
 
         // Initialiser les mini jeux disponibles
         initializeJeux();
@@ -262,7 +266,7 @@ public class GameController {
 
         Item parchemin = new Item("Parchemin",
                 "Un vieux parchemin à déchiffrer. Impossible de l'étudier dans un coin sombre, il faut trouver un endroit calme et éclairé.",
-                new java.io.File("assets/items/livre.png"), bibliothequeSorcier,
+                new java.io.File("assets/items/parchemin.png"), bibliothequeSorcier,
                 () -> {
                     // Action à exécuter lorsque l'item est cliqué
                     dialogueManager.afficherDialogue(
@@ -295,7 +299,7 @@ public class GameController {
                             () -> {
                                 // Lancer le mini-jeu 2
                                 if (!jeux.isEmpty()) {
-                                    Game miniJeu = jeux.get(0); // Prendre le 2ème mini-jeu
+                                    Game miniJeu = jeux.get(1); // Prendre le 2ème mini-jeu
                                     GameUtils.printDev("Lancement du mini-jeu: " + miniJeu.getName(), devMode);
                                     miniJeu.afficherMiniJeu(map); // Affiche le mini-jeu dans la même fenêtre
                                 } else {
@@ -369,7 +373,7 @@ public class GameController {
             });
             GameUtils.printDev("Mini-jeu de morpion terminé avec succès !", devMode);
         })); // Ajoute le morpion comme mini-jeu
-
+        jeux.add(new ParcheminGame(devMode, dialogueManager));
     }
 
     /**
