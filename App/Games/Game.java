@@ -27,7 +27,7 @@ public abstract class Game {
     public boolean isFinished() { return finished; }
 
     /**
-     * Affiche le mini-jeu dans la même fenêtre (superposé à la map), avec une croix pour fermer.
+     * Affiche le mini-jeu dans la même fenêtre (superposé à la map), sans croix de fermeture.
      * @param map la map sur laquelle ajouter le mini-jeu
      */
     public void afficherMiniJeu(Map map) {
@@ -35,17 +35,28 @@ public abstract class Game {
         miniJeuPanel = getMainPanel();
         miniJeuPanel.setLayout(null);
         miniJeuPanel.setBounds(0, 0, map.getWidth(), map.getHeight());
-        JButton closeBtn = new JButton("✖");
-        closeBtn.setFocusable(false);
-        closeBtn.setMargin(new Insets(0, 8, 0, 8));
-        closeBtn.setBounds(8, 8, 40, 32);
-        closeBtn.addActionListener(e -> retirerMiniJeu(map));
-        miniJeuPanel.add(closeBtn);
+        // Ajout du bouton Redémarrer automatiquement pour tous les jeux
+        JButton restartBtn = new JButton("Redémarrer");
+        restartBtn.setFont(new Font("Arial", Font.BOLD, 16));
+        restartBtn.setBounds(miniJeuPanel.getWidth() - 160, 20, 140, 40); // Position en haut à droite
+        restartBtn.addActionListener(e -> restart(map));
+        miniJeuPanel.add(restartBtn);
+        miniJeuPanel.setComponentZOrder(restartBtn, 0);
         map.setLayout(null); // Pour position absolue
         map.add(miniJeuPanel);
         map.setComponentZOrder(miniJeuPanel, 0); // Mettre au-dessus
         map.repaint();
         map.revalidate();
+    }
+
+    /**
+     * Redémarre le mini-jeu à zéro (ferme et réaffiche, réinitialise l'état)
+     * @param map la map sur laquelle afficher le mini-jeu
+     */
+    public void restart(Map map) {
+        retirerMiniJeu(map);
+        setFinished(false);
+        afficherMiniJeu(map);
     }
 
     /**
@@ -74,6 +85,11 @@ public abstract class Game {
         if (onCloseCallback != null) onCloseCallback.run();
     }
 
-    public void setFinished(boolean finished) { this.finished = finished; }
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+        if (finished && miniJeuPanel != null && miniJeuPanel.getParent() instanceof Map) {
+            retirerMiniJeu((Map) miniJeuPanel.getParent());
+        }
+    }
     public void setOnCloseCallback(Runnable callback) { this.onCloseCallback = callback; }
 }
