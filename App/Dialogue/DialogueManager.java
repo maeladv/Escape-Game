@@ -79,7 +79,7 @@ public class DialogueManager {
         private String currentMessage = "";
         private Timer animationTimer;
         private int currentIndex = 0;
-        private int animationSpeed = 40;
+        private int animationSpeed = 2; // Vitesse de l'animation en millisecondes
         private static final int MAX_LINES = 3;
         private static final int MAX_CHARS_PER_LINE = 50;
 
