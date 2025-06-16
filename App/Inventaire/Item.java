@@ -7,12 +7,19 @@ public class Item {
     private String description;
     private File imageFile;
     private Objet objet; // Référence à l'objet associé
+    private Runnable onClick; // Action à exécuter lorsque l'item est cliqué
 
-    public Item(String name, String description, File imageFile, Objet objet) {
+    public Item(String name, String description, File imageFile, Objet objet, Runnable onClick) {
         this.name = name;
         this.description = description;
         this.imageFile = imageFile;
         this.objet = objet;
+        this.onClick = onClick;
+    }
+
+    // Constructeur alternatif sans onClick
+    public Item(String name, String description, File imageFile, Objet objet) {
+        this(name, description, imageFile, objet, null);
     }
 
     public String getName() {return name;}
@@ -26,4 +33,7 @@ public class Item {
 
     public Objet getObjet() {return objet;}
     public void setObjet(Objet objet) { this.objet = objet; }
+
+    public Runnable getOnClick() { return onClick; }
+    public void setOnClick(Runnable onClick) { this.onClick = onClick; }
 }

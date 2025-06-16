@@ -216,7 +216,10 @@ public class GameController {
         );
         objetsBibliotheque.add(tableBibliotheque);
 
-        Item bougie = new Item("Bougie", "Une bougie qui semble encore allumée.", new java.io.File("assets/joueur/droite.png"), tableBibliotheque);
+        Item bougie = new Item("Bougie", "Une bougie qui semble encore allumée.", new java.io.File("assets/joueur/droite.png"), tableBibliotheque, () -> {
+            joueur.setPosition(430, 530);
+            joueur.setState(2);
+        });
         allItems.add(bougie);
         
         // Set initial map's walls to Map class
