@@ -105,4 +105,21 @@ public class GameUtils {
             }
         }
     }
+    
+    /**
+     * Charge une police personnalisée à partir d'un fichier TTF
+     * @param path Chemin du fichier TTF
+     * @param size Taille de la police
+     * @return Font chargée ou police par défaut si erreur
+     */
+    public static Font loadFont(String path, float size) {
+        try {
+            java.io.InputStream is = new java.io.FileInputStream(path);
+            Font font = Font.createFont(Font.TRUETYPE_FONT, is);
+            return font.deriveFont(size);
+        } catch (Exception e) {
+            System.err.println("Erreur de chargement de la police: " + e.getMessage());
+            return new Font("Arial", Font.PLAIN, (int) size);
+        }
+    }
 }

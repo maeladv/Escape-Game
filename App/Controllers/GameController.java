@@ -18,6 +18,7 @@ import App.Utils.GameUtils;
 import App.Games.Game;
 import App.Games.MorpionGame;
 import App.Games.ParcheminGame;
+import App.Games.CouleursGame;
 
 /**
  * GameController centralizes game logic and coordinates between different
@@ -153,6 +154,21 @@ public class GameController {
                     } else {
                         dialogueManager.afficherDialogue(
                                 "Aucun mini-jeu disponible pour le moment.",
+                                "OK");
+                    }
+                }));
+
+        // Objet qui lance le mini-jeu Couleurs
+        objetsIntro.add(new Objet("dalle de couleurs",
+                new Rectangle(300, 200, 60, 60), inventaire,
+                () -> {
+                    if (jeux.size() > 2) {
+                        Game miniJeu = jeux.get(2); // CouleursGame est le 3ème mini-jeu
+                        GameUtils.printDev("Lancement du mini-jeu: " + miniJeu.getName(), devMode);
+                        miniJeu.afficherMiniJeu(map);
+                    } else {
+                        dialogueManager.afficherDialogue(
+                                "Le mini-jeu Couleurs n'est pas disponible.",
                                 "OK");
                     }
                 }));
@@ -347,6 +363,21 @@ public class GameController {
 
         // Set initial map's walls to Map class
         map.setMurs(new ArrayList<>(mursParMap.get(currentMapIndex)));
+
+        // Objet qui lance le mini-jeu Couleurs (map 1)
+        objetsBibliotheque.add(new Objet("dalle de couleurs",
+                new Rectangle(300, 300, 60, 60), inventaire,
+                () -> {
+                    if (jeux.size() > 2) {
+                        Game miniJeu = jeux.get(2); // CouleursGame est le 3ème mini-jeu
+                        GameUtils.printDev("Lancement du mini-jeu: " + miniJeu.getName(), devMode);
+                        miniJeu.afficherMiniJeu(map);
+                    } else {
+                        dialogueManager.afficherDialogue(
+                                "Le mini-jeu Couleurs n'est pas disponible.",
+                                "OK");
+                    }
+                }));
     }
 
     // initialiser les mini-jeux disponibles
@@ -374,6 +405,7 @@ public class GameController {
             GameUtils.printDev("Mini-jeu de morpion terminé avec succès !", devMode);
         })); // Ajoute le morpion comme mini-jeu
         jeux.add(new ParcheminGame(devMode, dialogueManager));
+        jeux.add(new CouleursGame(devMode, dialogueManager));
     }
 
     /**
