@@ -17,6 +17,7 @@ public class ParcheminGame extends Game {
     private boolean solved = false;
     private final String correctCode = "le sorcier elzear"; // Code correct pour déchiffrer le parchemin
     private JButton quitButton; // Ajout du bouton quitter
+    private JPanel mainPanel; // Stocker le panel principal pour accès dans checkAnswer
 
     // Constructeur principal :
     public ParcheminGame(boolean devMode, DialogueManager dialogueManager) {
@@ -31,7 +32,7 @@ public class ParcheminGame extends Game {
 
     @Override
     public JPanel getMainPanel() {
-        JPanel mainPanel = new JPanel() {
+        mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -51,17 +52,26 @@ public class ParcheminGame extends Game {
         // Parchemin image (right)
         parcheminLabel = new JLabel();
         ImageIcon parcheminIcon = new ImageIcon("assets/games/parchemin/parchemin1.png");
-        Image parcheminImage = parcheminIcon.getImage().getScaledInstance(596, 750, Image.SCALE_SMOOTH);
-        parcheminLabel.setIcon(new ImageIcon(parcheminImage));
-        parcheminLabel.setBounds(400, 100, 256, 256);
+        Image parcheminImage = parcheminIcon.getImage();
+        // Affichage à taille naturelle ou max 400x600 (proportionnel)
+        int maxW = 350, maxH = 600;
+        int imgW = parcheminImage.getWidth(null);
+        int imgH = parcheminImage.getHeight(null);
+        double scale = Math.min(1.0, Math.min((double)maxW/imgW, (double)maxH/imgH));
+        int drawW = (int)(imgW * scale);
+        int drawH = (int)(imgH * scale);
+        Image scaled = parcheminImage.getScaledInstance(drawW, drawH, Image.SCALE_SMOOTH);
+        parcheminLabel.setIcon(new ImageIcon(scaled));
+        parcheminLabel.setBounds(340, 100, drawW, drawH); // Décalé à gauche
         mainPanel.add(parcheminLabel);
 
         // Text field with background (left)
         answerField = new JTextField();
         answerField.setBounds(80, 180, 200, 40);
         answerField.setFont(new Font("Serif", Font.PLAIN, 20));
+        // white text color
         answerField.setForeground(Color.WHITE);
-        answerField.setOpaque(false);
+        answerField.setOpaque(false); // 
         mainPanel.add(answerField);
 
         // Validate button with background
@@ -96,32 +106,38 @@ public class ParcheminGame extends Game {
         quitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setFinished(true); // Ferme proprement le mini-jeu
+                onClose();
             }
         });
         mainPanel.add(quitButton);
 
-        // Stocker le panel pour accès dans checkAnswer
-        this.mainPanel = mainPanel;
         return mainPanel;
     }
-
-    private JPanel mainPanel; // Ajouté pour manipuler les composants
 
     private void checkAnswer() {
         if (solved) return;
         String answer = answerField.getText().trim();
         if (answer.equalsIgnoreCase(correctCode)) {
-            parcheminLabel.setIcon(new ImageIcon("assets/games/parchemin/parchemin2.png"));
+            // Afficher le recto à la même taille que le verso
+            ImageIcon parchemin2Icon = new ImageIcon("assets/games/parchemin/parchemin2.png");
+            Image parchemin2Image = parchemin2Icon.getImage();
+            int maxW = 350, maxH = 600;
+            int imgW = parchemin2Image.getWidth(null);
+            int imgH = parchemin2Image.getHeight(null);
+            double scale = Math.min(1.0, Math.min((double)maxW/imgW, (double)maxH/imgH));
+            int drawW = (int)(imgW * scale);
+            int drawH = (int)(imgH * scale);
+            Image scaled = parchemin2Image.getScaledInstance(drawW, drawH, Image.SCALE_SMOOTH);
+            parcheminLabel.setIcon(new ImageIcon(scaled));
+            parcheminLabel.setBounds(340, 100, drawW, drawH);
             scriptLabel.setText("Bravo ! Le parchemin est déchiffré. Cliquez sur Quitter pour sortir.");
             solved = true;
-            // Supprimer le champ de texte et le bouton valider
             if (mainPanel != null) {
                 mainPanel.remove(answerField);
                 mainPanel.remove(validateButton);
                 mainPanel.repaint();
             }
-            quitButton.setVisible(true); // Affiche le bouton quitter
+            quitButton.setVisible(true);
         } else {
             scriptLabel.setText("Ce n'est pas la bonne réponse...");
         }
@@ -132,7 +148,16 @@ public class ParcheminGame extends Game {
         // Réinitialiser l'état si besoin
         solved = false;
         if (parcheminLabel != null) {
-            parcheminLabel.setIcon(new ImageIcon("assets/items/parchemin.png"));
+            ImageIcon parcheminIcon = new ImageIcon("assets/games/parchemin/parchemin1.png");
+            Image parcheminImage = parcheminIcon.getImage();
+            int imgW = parcheminImage.getWidth(null);
+            int imgH = parcheminImage.getHeight(null);
+            double scale = Math.min(1.0, Math.min((double)400/imgW, (double)600/imgH));
+            int drawW = (int)(imgW * scale);
+            int drawH = (int)(imgH * scale);
+            Image scaled = parcheminImage.getScaledInstance(drawW, drawH, Image.SCALE_SMOOTH);
+            parcheminLabel.setIcon(new ImageIcon(scaled));
+            parcheminLabel.setBounds(340, 100, drawW, drawH);
         }
         if (scriptLabel != null) {
             scriptLabel.setText("Oh, ce parchemin semble chiffré... Que pouvons-nous faire ?");
