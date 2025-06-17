@@ -14,14 +14,30 @@ import App.Dialogue.DialogueManager;
 
 public class CouleursGame extends Game implements MouseListener {
     private static final int GRID_SIZE = 3;
+    // Couleurs pastels et variées
     private static final Color[] COLORS = {
-        new Color(255, 0, 0),    // Rouge
-        new Color(0, 255, 0),    // Vert
-        new Color(0, 0, 255),    // Bleu
-        new Color(255, 255, 0)   // Jaune
+        new Color(137, 207, 240),   // Bleu pastel
+        new Color(255, 105, 97),   // Rouge pastel
+        new Color(119, 221, 119),  // Vert pastel
+        new Color(255, 179, 71),   // Orange pastel
+        new Color(44, 44, 84),     // Noir bleuté doux
+        new Color(186, 133, 255),  // Mauve pastel
+        new Color(255, 255, 153)   // Jaune pastel
+    };
+    // Solution : B R V
+    //             O N R
+    //             J R V
+    // Indices dans COLORS : 0=Bleu, 1=Rouge, 2=Vert, 3=Orange, 4=Noir, 5=Mauve, 6=Jaune
+    // Solution :
+    // vert   rouge   bleu
+    // rouge  noir    orange
+    // vert   rouge   jaune
+    private int[][] solution = {
+        {2, 1, 0},
+        {1, 4, 3},
+        {2, 1, 6}
     };
     private int[][] grid;
-    private int[][] solution;
     private JButton verifyButton;
     private String message = "";
     private Font gameFont;
@@ -32,11 +48,6 @@ public class CouleursGame extends Game implements MouseListener {
         super(devMode, "Couleurs", "Trouvez le bon pattern de couleurs !", "assets/games/", dialogueManager);
         this.grid = new int[GRID_SIZE][GRID_SIZE];
         for (int[] row : grid) Arrays.fill(row, 0);
-        this.solution = new int[][] {
-            {0, 1, 2},
-            {1, 2, 3},
-            {2, 3, 0}
-        };
         this.panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
