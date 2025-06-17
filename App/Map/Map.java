@@ -21,7 +21,7 @@ import java.util.List;
 public class Map extends JPanel {
     private int width;
     private int height;
-    private int displayedMap = 0; // Indice de la map affichée
+    private int displayedMap = 1; // Indice de la map affichée
     private String[] mapPath = {"assets/maps/intro/map.png","assets/maps/library/map.png"};
     private String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png"};
     private BufferedImage mapImage; // permet de stocker l'image de la map

@@ -15,17 +15,18 @@ public class ParcheminGame extends Game {
     private JButton validateButton;
     private JLabel scriptLabel;
     private boolean solved = false;
-    private final String correctCode = "INSACODE"; // À personnaliser
+    private final String correctCode = "le sorcier elzear"; // Code correct pour déchiffrer le parchemin
+    private JButton quitButton; // Ajout du bouton quitter
 
     // Constructeur principal :
     public ParcheminGame(boolean devMode, DialogueManager dialogueManager) {
-        super(devMode, "Parchemin", "Mini-jeu du parchemin", "assets/items/", dialogueManager, () -> {
+        super(devMode, "Parchemin", "Mini-jeu du parchemin", "assets/games/parchemin", dialogueManager, () -> {
             dialogueManager.afficherDialogue("Bravo ! Le parchemin est déchiffré.", "Super !");
         });
     }
 
     public ParcheminGame(boolean devMode, DialogueManager dialogueManager, Runnable onCloseCallback) {
-        super(devMode, "Parchemin", "Mini-jeu du parchemin", "assets/items/", dialogueManager, onCloseCallback);
+        super(devMode, "Parchemin", "Mini-jeu du parchemin", "assets/games/parchemin", dialogueManager, onCloseCallback);
     }
 
     @Override
@@ -49,8 +50,8 @@ public class ParcheminGame extends Game {
 
         // Parchemin image (right)
         parcheminLabel = new JLabel();
-        ImageIcon parcheminIcon = new ImageIcon("assets/items/parchemin.png");
-        Image parcheminImage = parcheminIcon.getImage().getScaledInstance(256, 256, Image.SCALE_SMOOTH);
+        ImageIcon parcheminIcon = new ImageIcon("assets/games/parchemin/parchemin1.png");
+        Image parcheminImage = parcheminIcon.getImage().getScaledInstance(596, 750, Image.SCALE_SMOOTH);
         parcheminLabel.setIcon(new ImageIcon(parcheminImage));
         parcheminLabel.setBounds(400, 100, 256, 256);
         mainPanel.add(parcheminLabel);
@@ -59,9 +60,8 @@ public class ParcheminGame extends Game {
         answerField = new JTextField();
         answerField.setBounds(80, 180, 200, 40);
         answerField.setFont(new Font("Serif", Font.PLAIN, 20));
-        // white text color
         answerField.setForeground(Color.WHITE);
-        answerField.setOpaque(false); // 
+        answerField.setOpaque(false);
         mainPanel.add(answerField);
 
         // Validate button with background
@@ -81,17 +81,47 @@ public class ParcheminGame extends Game {
             }
         });
         mainPanel.add(validateButton);
+
+        // Bouton Quitter (caché au début)
+        quitButton = new JButton(new ImageIcon("assets/bouton.png"));
+        quitButton.setText("Quitter");
+        quitButton.setHorizontalTextPosition(JButton.CENTER);
+        quitButton.setVerticalTextPosition(JButton.CENTER);
+        quitButton.setBounds(80, 310, 200, 50);
+        quitButton.setFont(new Font("Serif", Font.BOLD, 20));
+        quitButton.setForeground(Color.WHITE);
+        quitButton.setContentAreaFilled(false);
+        quitButton.setBorderPainted(false);
+        quitButton.setVisible(false);
+        quitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setFinished(true); // Ferme proprement le mini-jeu
+            }
+        });
+        mainPanel.add(quitButton);
+
+        // Stocker le panel pour accès dans checkAnswer
+        this.mainPanel = mainPanel;
         return mainPanel;
     }
+
+    private JPanel mainPanel; // Ajouté pour manipuler les composants
 
     private void checkAnswer() {
         if (solved) return;
         String answer = answerField.getText().trim();
         if (answer.equalsIgnoreCase(correctCode)) {
-            parcheminLabel.setIcon(new ImageIcon("assets/items/parchemin_dechiffre.png"));
-            scriptLabel.setText("Bravo ! Le parchemin est déchiffré.");
+            parcheminLabel.setIcon(new ImageIcon("assets/games/parchemin/parchemin2.png"));
+            scriptLabel.setText("Bravo ! Le parchemin est déchiffré. Cliquez sur Quitter pour sortir.");
             solved = true;
-            setFinished(true); // Ferme le mini-jeu à la réussite
+            // Supprimer le champ de texte et le bouton valider
+            if (mainPanel != null) {
+                mainPanel.remove(answerField);
+                mainPanel.remove(validateButton);
+                mainPanel.repaint();
+            }
+            quitButton.setVisible(true); // Affiche le bouton quitter
         } else {
             scriptLabel.setText("Ce n'est pas la bonne réponse...");
         }
@@ -109,6 +139,13 @@ public class ParcheminGame extends Game {
         }
         if (answerField != null) {
             answerField.setText("");
+            answerField.setEnabled(true);
+        }
+        if (validateButton != null) {
+            validateButton.setEnabled(true);
+        }
+        if (quitButton != null) {
+            quitButton.setVisible(false);
         }
         setFinished(false);
         super.onClose();
