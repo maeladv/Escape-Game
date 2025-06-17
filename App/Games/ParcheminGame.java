@@ -18,12 +18,11 @@ public class ParcheminGame extends Game {
     private final String correctCode = "le sorcier elzear"; // Code correct pour déchiffrer le parchemin
     private JButton quitButton; // Ajout du bouton quitter
     private JPanel mainPanel; // Stocker le panel principal pour accès dans checkAnswer
+    private JButton restartBtn; // Ajout d'une référence au bouton Redémarrer
 
     // Constructeur principal :
     public ParcheminGame(boolean devMode, DialogueManager dialogueManager) {
-        super(devMode, "Parchemin", "Mini-jeu du parchemin", "assets/games/parchemin", dialogueManager, () -> {
-            dialogueManager.afficherDialogue("Bravo ! Le parchemin est déchiffré.", "Super !");
-        });
+        super(devMode, "Parchemin", "Mini-jeu du parchemin", "assets/games/parchemin", dialogueManager, null);
     }
 
     public ParcheminGame(boolean devMode, DialogueManager dialogueManager, Runnable onCloseCallback) {
@@ -106,7 +105,11 @@ public class ParcheminGame extends Game {
         quitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                onClose();
+                setFinished(true);
+                // Afficher le message de félicitations APRÈS la fermeture
+                SwingUtilities.invokeLater(() -> {
+                    dialogueManager.afficherDialogue("Bravo ! Le parchemin est déchiffré.", "Super !");
+                });
             }
         });
         mainPanel.add(quitButton);
@@ -132,12 +135,18 @@ public class ParcheminGame extends Game {
             parcheminLabel.setBounds(340, 100, drawW, drawH);
             scriptLabel.setText("Bravo ! Le parchemin est déchiffré. Cliquez sur Quitter pour sortir.");
             solved = true;
+            if (restartBtn != null) {
+                mainPanel.remove(restartBtn);
+                restartBtn = null;
+                mainPanel.repaint();
+            }
             if (mainPanel != null) {
                 mainPanel.remove(answerField);
                 mainPanel.remove(validateButton);
                 mainPanel.repaint();
             }
             quitButton.setVisible(true);
+            if (restartBtn != null) restartBtn.setVisible(false);
         } else {
             scriptLabel.setText("Ce n'est pas la bonne réponse...");
         }
@@ -171,6 +180,9 @@ public class ParcheminGame extends Game {
         }
         if (quitButton != null) {
             quitButton.setVisible(false);
+        }
+        if (restartBtn != null) {
+            restartBtn.setVisible(true);
         }
         setFinished(false);
         super.onClose();
