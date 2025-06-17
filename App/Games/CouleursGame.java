@@ -11,31 +11,33 @@ import java.util.Arrays;
 
 import App.Utils.GameUtils;
 import App.Dialogue.DialogueManager;
+import App.Map.Map;
 
 public class CouleursGame extends Game implements MouseListener {
     private static final int GRID_SIZE = 3;
     // Couleurs pastels et variées
     private static final Color[] COLORS = {
-        new Color(137, 207, 240),   // Bleu pastel
-        new Color(255, 105, 97),   // Rouge pastel
-        new Color(119, 221, 119),  // Vert pastel
-        new Color(255, 179, 71),   // Orange pastel
-        new Color(44, 44, 84),     // Noir bleuté doux
-        new Color(186, 133, 255),  // Mauve pastel
-        new Color(255, 255, 153)   // Jaune pastel
+            new Color(137, 207, 240), // Bleu pastel
+            new Color(255, 105, 97), // Rouge pastel
+            new Color(119, 221, 119), // Vert pastel
+            new Color(255, 179, 71), // Orange pastel
+            new Color(44, 44, 84), // Noir bleuté doux
+            new Color(186, 133, 255), // Mauve pastel
+            new Color(255, 255, 153) // Jaune pastel
     };
     // Solution : B R V
-    //             O N R
-    //             J R V
-    // Indices dans COLORS : 0=Bleu, 1=Rouge, 2=Vert, 3=Orange, 4=Noir, 5=Mauve, 6=Jaune
+    // O N R
+    // J R V
+    // Indices dans COLORS : 0=Bleu, 1=Rouge, 2=Vert, 3=Orange, 4=Noir, 5=Mauve,
+    // 6=Jaune
     // Solution :
-    // vert   rouge   bleu
-    // rouge  noir    orange
-    // vert   rouge   jaune
+    // vert rouge bleu
+    // rouge noir orange
+    // vert rouge jaune
     private int[][] solution = {
-        {2, 1, 0},
-        {1, 4, 3},
-        {2, 1, 6}
+            { 2, 1, 0 },
+            { 1, 4, 3 },
+            { 2, 1, 6 }
     };
     private int[][] grid;
     private JButton verifyButton;
@@ -47,7 +49,8 @@ public class CouleursGame extends Game implements MouseListener {
     public CouleursGame(boolean devMode, DialogueManager dialogueManager) {
         super(devMode, "Couleurs", "Trouvez le bon pattern de couleurs !", "assets/games/", dialogueManager);
         this.grid = new int[GRID_SIZE][GRID_SIZE];
-        for (int[] row : grid) Arrays.fill(row, 0);
+        for (int[] row : grid)
+            Arrays.fill(row, 0);
         this.panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -97,8 +100,9 @@ public class CouleursGame extends Game implements MouseListener {
             panel.repaint();
             setFinished(true);
             if (dialogueManager != null) {
-                dialogueManager.afficherScript(new String[]{"Bravo ! Le défi est réussi."}, "Suivant", () -> {
-                    if (onCloseCallback != null) onCloseCallback.run();
+                dialogueManager.afficherScript(new String[] { "Bravo ! Le défi est réussi." }, "Suivant", () -> {
+                    if (onCloseCallback != null)
+                        onCloseCallback.run();
                 });
             } else if (onCloseCallback != null) {
                 onCloseCallback.run();
@@ -126,13 +130,44 @@ public class CouleursGame extends Game implements MouseListener {
         }
     }
 
-    @Override public void mousePressed(MouseEvent e) {}
-    @Override public void mouseReleased(MouseEvent e) {}
-    @Override public void mouseEntered(MouseEvent e) {}
-    @Override public void mouseExited(MouseEvent e) {}
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
 
     @Override
     public void setOnCloseCallback(Runnable callback) {
         this.onCloseCallback = callback;
+    }
+
+    public void resetGrid() {
+        for (int[] row : grid)
+            Arrays.fill(row, 0);
+        message = "";
+        panel.repaint();
+    }
+
+    @Override
+    public void restart(Map map) {
+        super.restart(map);
+        resetGrid();
+        if (panel != null) {
+            map.remove(panel);
+            map.add(panel);
+            map.repaint();
+            map.revalidate();
+        }
+
     }
 }
