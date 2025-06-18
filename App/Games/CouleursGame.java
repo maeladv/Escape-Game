@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.util.Arrays;
 
@@ -40,10 +41,11 @@ public class CouleursGame extends Game implements MouseListener {
             { 2, 1, 6 }
     };
     private int[][] grid;
-    private JButton verifyButton;
     private String message = "";
     private Font gameFont;
-    private JPanel panel;
+    private JLabel messageLabel;
+    private JPanel mainPanel;
+    private JButton verifyButton;
     private Runnable onCloseCallback;
 
     public CouleursGame(boolean devMode, DialogueManager dialogueManager) {
@@ -51,7 +53,12 @@ public class CouleursGame extends Game implements MouseListener {
         this.grid = new int[GRID_SIZE][GRID_SIZE];
         for (int[] row : grid)
             Arrays.fill(row, 0);
-        this.panel = new JPanel() {
+        this.gameFont = GameUtils.loadFont("assets/yoster.ttf", 24f);
+    }
+
+    @Override
+    public JPanel getMainPanel() {
+        mainPanel = new JPanel(null) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -66,23 +73,22 @@ public class CouleursGame extends Game implements MouseListener {
                         g.drawRect(margin + j * (size + margin), margin + i * (size + margin), size, size);
                     }
                 }
-                g.setColor(Color.BLACK);
-                g.drawString(message, 20, 320);
             }
         };
-        this.panel.setLayout(null);
-        this.panel.setBounds(0, 0, 400, 400);
-        this.verifyButton = new JButton("Vérifier");
-        this.verifyButton.setBounds(100, 350, 120, 40);
-        this.verifyButton.addActionListener(e -> verifyPattern());
-        this.panel.add(verifyButton);
-        this.panel.addMouseListener(this);
-        this.gameFont = GameUtils.loadFont("assets/yoster.ttf", 24f);
-    }
+        mainPanel.setBounds(0, 0, 400, 400);
+        mainPanel.addMouseListener(this);
 
-    @Override
-    public JPanel getMainPanel() {
-        return panel;
+        verifyButton = new JButton("Vérifier");
+        verifyButton.setBounds(100, 350, 120, 40);
+        verifyButton.addActionListener(e -> verifyPattern());
+        mainPanel.add(verifyButton);
+
+        messageLabel = new JLabel("");
+        messageLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        messageLabel.setBounds(20, 300, 350, 40);
+        mainPanel.add(messageLabel);
+
+        return mainPanel;
     }
 
     private void verifyPattern() {
@@ -97,7 +103,7 @@ public class CouleursGame extends Game implements MouseListener {
         }
         if (correct) {
             message = "Bravo ! Le défi est réussi.";
-            panel.repaint();
+            messageLabel.setText(message);
             setFinished(true);
             if (dialogueManager != null) {
                 dialogueManager.afficherScript(new String[] { "Bravo ! Le défi est réussi." }, "Suivant", () -> {
@@ -109,8 +115,9 @@ public class CouleursGame extends Game implements MouseListener {
             }
         } else {
             message = "Patern faux, l'orage se rapproche";
-            panel.repaint();
+            messageLabel.setText(message);
         }
+        mainPanel.repaint();
     }
 
     @Override
@@ -123,28 +130,17 @@ public class CouleursGame extends Game implements MouseListener {
                 int y = margin + i * (size + margin);
                 if (e.getX() >= x && e.getX() <= x + size && e.getY() >= y && e.getY() <= y + size) {
                     grid[i][j] = (grid[i][j] + 1) % COLORS.length;
-                    panel.repaint();
+                    mainPanel.repaint();
                     return;
                 }
             }
         }
     }
 
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
+    @Override public void mousePressed(MouseEvent e) {}
+    @Override public void mouseReleased(MouseEvent e) {}
+    @Override public void mouseEntered(MouseEvent e) {}
+    @Override public void mouseExited(MouseEvent e) {}
 
     @Override
     public void setOnCloseCallback(Runnable callback) {
@@ -155,19 +151,19 @@ public class CouleursGame extends Game implements MouseListener {
         for (int[] row : grid)
             Arrays.fill(row, 0);
         message = "";
-        panel.repaint();
+        if (messageLabel != null) messageLabel.setText("");
+        if (mainPanel != null) mainPanel.repaint();
+    }
+
+    @Override
+    public void onClose() {
+        resetGrid();
+        super.onClose();
     }
 
     @Override
     public void restart(Map map) {
-        super.restart(map);
         resetGrid();
-        if (panel != null) {
-            map.remove(panel);
-            map.add(panel);
-            map.repaint();
-            map.revalidate();
-        }
-
+        super.restart(map);
     }
 }
