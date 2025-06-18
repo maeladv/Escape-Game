@@ -311,7 +311,7 @@ public class GameController {
                             () -> joueur.setCanMove(true));
                     // lancer le mini jeu 2 après validation du dialogue
                     dialogueManager.afficherDialogue(
-                            "Mais il ne semble pas écrit en français... Essayons de le déchiffer", "C'est parti",
+                            "Une table avec une bougie, j'y verrai mieux ici !", "S'asseoire",
                             () -> {
                                 // Lancer le mini-jeu 2
                                 if (!jeux.isEmpty()) {

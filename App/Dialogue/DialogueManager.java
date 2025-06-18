@@ -36,6 +36,7 @@ public class DialogueManager {
             }
         });
         parent.add(currentDialogue);
+        parent.setComponentZOrder(currentDialogue, 0); // Met le dialogue au premier plan
         currentDialogue.setBounds((parent.getWidth() - (parent.getWidth() * 3 / 4)) / 2, parent.getHeight() - parent.getHeight() / 4 - 20, parent.getWidth() * 3 / 4, parent.getHeight() / 4);
         parent.setLayout(null);
         parent.revalidate();
