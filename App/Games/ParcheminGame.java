@@ -115,7 +115,7 @@ public class ParcheminGame extends Game {
                 setFinished(true);
                 // Afficher le message de félicitations APRÈS la fermeture
                 SwingUtilities.invokeLater(() -> {
-                    dialogueManager.afficherDialogue("Bravo ! Le parchemin est déchiffré.", "Super !");
+                    dialogueManager.afficherDialogue("Bravo ! Vous avez résolu l'énigme du parchemin", "Super !");
                 });
             }
         });
@@ -237,7 +237,7 @@ public class ParcheminGame extends Game {
             super.restart(map);
         } else {
             // afficher un message
-            dialogueManager.afficherDialogue("Vous avez déjà déchiffré le parchemin !", "OK");
+            dialogueManager.afficherDialogue("Vous avez déjà résolu cette énigme !", "OK");
         }
     }
 }

@@ -221,13 +221,12 @@ public class GameController {
                 new Rectangle(70, 480, 50, 20), inventaire,
                 () -> {
                     String[] messages = {
-                            "Ah! Il semblerait que l'on puisse interagir avec ces bibliotheques.",
-                            "Ce vieux bâtiment est donc une bibliothèque.",
-                            "Elle me semble très ancienne et poussiereuse. Certains murs tombent même en ruines !",
-                            "On dirait qu'elle n'a pas ete utilisée depuis des années.",
-                            "Peut-être que quelqu'un a laissé un message ici ?",
-                            "Il y a des livres sur les etagères, mais certaines sont encore trop poussiereuses pour etre ouvertes.",
-                            "Oh, je viens de trouver un balai !"
+                            "Ah! Il semblerait que l'on puisse interagir avec ces bibliothèques.",
+                            "Ce vieux bâtiment est donc une vieille bibliothèque.",
+                            "Elle me semble très ancienne et poussiéreuse. Certains murs tombent même en ruines !",
+                            "On dirait qu'elle n'a pas ete visitée depuis des années, pourtant les bougies sont encore allumées...",
+                            "Il y a des livres sur les etagères, mais certaines sont encore trop poussiéreuses pour etre ouvertes.",
+                            "Oh, je viens de trouver un balai ! Cela pourra me servir !"
                     };
                     dialogueManager.afficherScript(messages, "Suivant");
                 });
@@ -247,17 +246,16 @@ public class GameController {
                 () -> {
                     String[] messages = {
                             "Ahh ! Cela fait du bien de nettoyer un peu ! Je peux enfin y voir plus clair !",
-                            "Voyons, voir il semblerait y avoir un parchemin ici. Il est encore lisible !",
-                            "Voyons voir ce qu'il y a dessus !",
-                            "Mais il ne semble pas écrit en français...",
-                            "Enfin, je ne parviens pas bien à voir ce qu'il y a dessus. Il me faudrait un peu plus de lumière.",
+                            "Voyons voir, il semblerait y avoir un parchemin ici. Il semble encore lisible !",
+                            "Voyons voir ce qu'il y a dessus ! Il est plutôt abimé.",
+                            "Mince, je ne parviens pas bien à voir ce qu'il y a dessus. Il me faudrait un peu plus de lumière.",
                     };
                     dialogueManager.afficherScript(messages, "Suivant");
                 },
                 () -> {
                     String[] messages = {
                             "MMhh, il y a quelque chose ici, mais je ne parviens pas à voir ce que c'est...",
-                            "PIl y a trop de poussière, il faudrait que je nettoie un peu.",
+                            "Il y a trop de poussière, il faudrait que je nettoie un peu.",
                     };
                     dialogueManager.afficherScript(messages, "OK");
                 });
@@ -268,7 +266,7 @@ public class GameController {
         objetsParMap.add(objetsBibliotheque);
 
         Item parchemin = new Item("Parchemin",
-                "Un vieux parchemin à déchiffrer. Impossible de l'étudier dans un coin sombre, il faut trouver un endroit calme et éclairé.",
+                "Un vieux parchemin à examiner. Impossible de l'étudier dans un coin sombre, il faut trouver un endroit calme et éclairé.",
                 new java.io.File("assets/items/parchemin.png"), bibliothequeSorcier,
                 () -> {
                     // Action à exécuter lorsque l'item est cliqué
@@ -322,16 +320,26 @@ public class GameController {
 
         // Grande bibliothèque qui donne un livre
         Objet grandeBibliotheque = new Objet("Grande bibliothèque",
-                new Rectangle(40, 100, 60, 30), inventaire,
-                () ->{
+                new Rectangle(40, 100, 60, 30), inventaire, null,
+                () -> {
                     String[] messages = {
-                            "J'ai trouvé un livre ancien ! Il semble très mystérieux.",
-                            "Il est écrit par un certain Elzéar, il semble contenir la recette d'une potion magique...",
-                            "Il y a des notes dans les marges, peut-être que quelqu'un l'a déjà lu ?",
-                            "On dirait que cette potion a déjà été préparée mais... où pourrait-elle se trouver ?"
+                            "Ah! Avec cette échelle tout est plus accessible !",
+                            "Je vais pouvoir accéder à ce livre que je voyais d'en bas !",
+                            "C'est bon! Il est très ancien !",
+                            "Il serait écrit par un certain Elzéar et semble contenir la recette d'une potion magique...",
+                            "On dirait que cette potion a déjà été préparée mais... où pourrait-elle se trouver ?",
+                            "Il y a aussi des notes dans les marges, \"Ce livre vous rendra imbattable au morpion !\"",
                     };
                     dialogueManager.afficherScript(messages, "Suivant", () -> {
                     });
+                },
+                () -> {
+                    String[] messages = {
+                            "Cette bibliothèque est immense !",
+                            "Il y a tellement de livres, je ne sais pas par où commencer.",
+                            "Je vois un livre mais je ne parviens pas à l'atteindre... Il me faudrait quelque chose pour grimper.",
+                    };
+                    dialogueManager.afficherScript(messages, "OK");
                 });
         objetsBibliotheque.add(grandeBibliotheque);
 
@@ -340,8 +348,7 @@ public class GameController {
                 "Un livre ancien, il semble avoir été écrit par un sorcier.",
                 new java.io.File("assets/items/livre.png"), grandeBibliotheque,
                 () -> {
-                    // Action à exécuter lorsque l'item est cliqué
-
+                    // à définir + tard car la table n'est pas encore créée
                 });
 
         // Ajouter l'item à la liste globale des items
@@ -350,21 +357,43 @@ public class GameController {
         // Table with dialogue
         Objet tableBibliotheque = new Objet("table de la bibliothèque",
                 new Rectangle(600, 510, 50, 20), inventaire, livre,
-                () -> dialogueManager.afficherDialogue(
+                () -> {
+                    // Lancer le mini-jeu de morpion après validation du dialogue
+
+                    dialogueManager.afficherDialogue(
                         "Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.",
                         "OK",
-                        () -> joueur.setCanMove(true)),
-                () -> dialogueManager.afficherDialogue(
-                        "Trouver le livre pour interagir. Appuyez sur OK pour continuer.",
-                        "OK",
-                        () -> joueur.setCanMove(true)));
+                        () -> {
+                            joueur.setCanMove(true);
+                            if (jeux.size() > 0) {
+                                Game miniJeu = jeux.get(0); // MorpionGame est le 1er mini-jeu
+                                GameUtils.printDev("Lancement du mini-jeu: " + miniJeu.getName(), devMode);
+                                miniJeu.afficherMiniJeu(map); // Affiche le mini-jeu dans la même fenêtre
+                            } else {
+                                dialogueManager.afficherDialogue(
+                                        "Aucun mini-jeu disponible pour le moment.",
+                                        "OK");
+                            }
+                        });
+                        
+                        
+                        
+                    },
+                () -> {
+                    String[] messages = {
+                        "Il y a une potion et des ingrédients sur cette table mais...",
+                        "La potion semble incomplète, peut-être que je peux la terminer ?",
+                        "Il me faudrait en trouver la recette pour la terminer.",
+                    };
+                    dialogueManager.afficherScript(messages, "OK");}
+                        );
         objetsBibliotheque.add(tableBibliotheque);
 
         // Créer d'abord l'item sans l'action
         Item potionItem = new Item("Potion de téléportation",
                 "Vous allez être téléporté.e.",
                 new java.io.File("assets/items/potion.png"),
-                tableBibliotheque);
+                null);
 
         // Définir l'action après la création de l'item
         potionItem.setOnClick(() -> {
@@ -374,6 +403,19 @@ public class GameController {
         });
 
         allItems.add(potionItem);
+
+        // échelle item
+        Item echelle = new Item("Échelle",
+                "Une échelle en bois, elle semble solide.",
+                new java.io.File("assets/items/echelle.png"), tableBibliotheque1,
+                () -> {
+                    // Action à exécuter lorsque l'item est cliqué
+                });
+
+        // Ajouter l'item à la liste globale des items
+        allItems.add(echelle);
+
+        grandeBibliotheque.setItemToInteract(echelle);
 
         // Set initial map's walls to Map class
         map.setMurs(new ArrayList<>(mursParMap.get(currentMapIndex)));
@@ -399,16 +441,16 @@ public class GameController {
         jeux = new ArrayList<>();
         jeux.add(new MorpionGame(devMode, dialogueManager, () -> {
             String[] script = {
-                    "Bravo! Vous avez réussi le mini-jeu de morpion !",
-                    "Vous pouvez continuer votre aventure dans la bibliothèque."
+                    "Bravo! !",
+                    "Vous avez réussi à bien mélanger la potion! Que pourriez-vous faire avec ?",
             };
             dialogueManager.afficherScript(script, "Suivant", () -> {
-                // Donne la clé de la bibliothèque à la fin du morpion
+                // Donne la potion de téléportation à la fin du morpion
                 for (Item item : allItems) {
-                    if (item.getName().equals("Clé")) {
+                    if (item.getName().equals("Potion de téléportation")) {
                         if (!inventaire.contientItem(item.getName())) {
                             inventaire.ajouterItem(item);
-                            GameUtils.printDev("Clé de la bibliothèque ajoutée à l'inventaire après le morpion.",
+                            GameUtils.printDev("Potion de téléportation ajoutée à l'inventaire après le mini-jeu de morpion.",
                                     devMode);
                             updateInventaireUI();
                         }
@@ -418,7 +460,26 @@ public class GameController {
             });
             GameUtils.printDev("Mini-jeu de morpion terminé avec succès !", devMode);
         })); // Ajoute le morpion comme mini-jeu
-        jeux.add(new ParcheminGame(devMode, dialogueManager));
+        jeux.add(new ParcheminGame(devMode, dialogueManager, () -> {
+            String[] script = {
+                    "Bravo! Vous avez réussi le mini-jeu de parchemin !",
+                    "Vous pouvez continuer votre aventure dans la bibliothèque."
+            };
+            dialogueManager.afficherScript(script, "Suivant");
+            
+            // donne l'échelle au joueur
+            for (Item item : allItems) {
+                if (item.getName().equals("Échelle")) {
+                    if (!inventaire.contientItem(item.getName())) {
+                        inventaire.ajouterItem(item);
+                        GameUtils.printDev("Échelle ajoutée à l'inventaire après le mini-jeu de parchemin.",
+                                devMode);
+                        updateInventaireUI();
+                    }
+                    break;
+                }
+            }
+        })); // Ajoute le parchemin comme mini-jeu
         jeux.add(new CouleursGame(devMode, dialogueManager));
     }
 
@@ -429,12 +490,12 @@ public class GameController {
         String[] introScript = {
                 "Bienvenue dans Escape From The Biblioteca !",
                 "Que voit-on au loin ? Une coline ? Un vieux village ?",
-                "Je ne sais pas, cette foret est si sombre et si dense...",
-                "Et que voici par ici ? Un vieux batiment ? Peut-etre un chateau abandonne ?",
-                "Enfin, c'est etrange, il n'y a pas un bruit et des torches sont encore allumees !",
+                "Je ne sais pas, cette forêt est si sombre et si dense...",
+                "Et que voici par ici ? Un vieux bâtiment ? Peut-etre un château abandonné ?",
+                "Enfin, c'est étrange, il n'y a pas un bruit et des torches sont encore allumées !",
                 "On pourrait croire que quelqu'un vit encore ici...",
-                "Cette foret ne m'inspire pas confiance mais... le temps semble s'y etre fige.",
-                "La nuit tombe, je n'ai d'autre choix que d'entrer dans ce batiment.",
+                "Cette forêt ne m'inspire pas confiance mais... le temps semble s'y etre figé.",
+                "La nuit tombe, je n'ai d'autre choix que d'entrer dans ce bâtiment.",
         };
 
         // Show the introduction script
