@@ -212,6 +212,10 @@ public class GameController {
         mursBibliotheque.add(new Rectangle(600, 515, 45, 20));
 
         mursParMap.add(mursBibliotheque);
+        // Ajout d'une troisième map vide si besoin
+        if (mursParMap.size() < 3) {
+            mursParMap.add(new ArrayList<>());
+        }
 
         // Initialiser les objets de la map1 (Bibliothèque)
         List<Objet> objetsBibliotheque = new ArrayList<>();
@@ -264,6 +268,10 @@ public class GameController {
 
         // Ajouter l'objet de la bibliothèque à la liste des objets de la map
         objetsParMap.add(objetsBibliotheque);
+        // Ajout d'une troisième map vide si besoin
+        if (objetsParMap.size() < 3) {
+            objetsParMap.add(new ArrayList<>());
+        }
 
         Item parchemin = new Item("Parchemin",
                 "Un vieux parchemin à examiner. Impossible de l'étudier dans un coin sombre, il faut trouver un endroit calme et éclairé.",
@@ -429,8 +437,9 @@ public class GameController {
                         GameUtils.printDev("Lancement du mini-jeu: " + miniJeu.getName(), devMode);
                         miniJeu.afficherMiniJeu(map);
                     } else {
+                        GameUtils.printDev("Erreur: jeux.size()=" + jeux.size() + ", impossible d'accéder à l'index 2 (CouleursGame)", devMode);
                         dialogueManager.afficherDialogue(
-                                "Le mini-jeu Couleurs n'est pas disponible.",
+                                "Le mini-jeu Couleurs n'est pas disponible (erreur d'index).",
                                 "OK");
                     }
                 }));
@@ -481,6 +490,9 @@ public class GameController {
             }
         })); // Ajoute le parchemin comme mini-jeu
         jeux.add(new CouleursGame(devMode, dialogueManager));
+        if (jeux.size() < 3) {
+            GameUtils.printDev("Attention: la liste des mini-jeux ne contient pas 3 éléments! Taille actuelle: " + jeux.size(), devMode);
+        }
     }
 
     /**
