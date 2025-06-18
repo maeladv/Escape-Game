@@ -159,7 +159,6 @@ public class GameController {
                 }));
 
         // Objet qui lance le mini-jeu Couleurs
-        
 
         objetsParMap.add(objetsIntro);
 
@@ -321,9 +320,36 @@ public class GameController {
 
         objetsBibliotheque.add(tableBibliotheque1);
 
+        // Grande bibliothèque qui donne un livre
+        Objet grandeBibliotheque = new Objet("Grande bibliothèque",
+                new Rectangle(40, 100, 60, 30), inventaire,
+                () ->{
+                    String[] messages = {
+                            "J'ai trouvé un livre ancien ! Il semble très mystérieux.",
+                            "Il est écrit par un certain Elzéar, il semble contenir la recette d'une potion magique...",
+                            "Il y a des notes dans les marges, peut-être que quelqu'un l'a déjà lu ?",
+                            "On dirait que cette potion a déjà été préparée mais... où pourrait-elle se trouver ?"
+                    };
+                    dialogueManager.afficherScript(messages, "Suivant", () -> {
+                    });
+                });
+        objetsBibliotheque.add(grandeBibliotheque);
+
+        // item livre
+        Item livre = new Item("Livre ancien",
+                "Un livre ancien, il semble avoir été écrit par un sorcier.",
+                new java.io.File("assets/items/livre.png"), grandeBibliotheque,
+                () -> {
+                    // Action à exécuter lorsque l'item est cliqué
+
+                });
+
+        // Ajouter l'item à la liste globale des items
+        allItems.add(livre);
+
         // Table with dialogue
         Objet tableBibliotheque = new Objet("table de la bibliothèque",
-                new Rectangle(600, 510, 50, 20), inventaire, parchemin,
+                new Rectangle(600, 510, 50, 20), inventaire, livre,
                 () -> dialogueManager.afficherDialogue(
                         "Ceci est une table de la bibliothèque. Appuyez sur OK pour continuer.",
                         "OK",
@@ -336,7 +362,7 @@ public class GameController {
 
         // Créer d'abord l'item sans l'action
         Item potionItem = new Item("Potion de téléportation",
-                "Vous allez être téléporter.",
+                "Vous allez être téléporté.e.",
                 new java.io.File("assets/items/potion.png"),
                 tableBibliotheque);
 
