@@ -159,19 +159,7 @@ public class GameController {
                 }));
 
         // Objet qui lance le mini-jeu Couleurs
-        objetsIntro.add(new Objet("dalle de couleurs",
-                new Rectangle(300, 200, 60, 60), inventaire,
-                () -> {
-                    if (jeux.size() > 2) {
-                        Game miniJeu = jeux.get(2); // CouleursGame est le 3ème mini-jeu
-                        GameUtils.printDev("Lancement du mini-jeu: " + miniJeu.getName(), devMode);
-                        miniJeu.afficherMiniJeu(map);
-                    } else {
-                        dialogueManager.afficherDialogue(
-                                "Le mini-jeu Couleurs n'est pas disponible.",
-                                "OK");
-                    }
-                }));
+        
 
         objetsParMap.add(objetsIntro);
 
@@ -366,7 +354,7 @@ public class GameController {
 
         // Objet qui lance le mini-jeu Couleurs (map 1)
         objetsBibliotheque.add(new Objet("dalle de couleurs",
-                new Rectangle(300, 300, 60, 60), inventaire,
+                new Rectangle(420, 290, 50, 30), inventaire,
                 () -> {
                     if (jeux.size() > 2) {
                         Game miniJeu = jeux.get(2); // CouleursGame est le 3ème mini-jeu
