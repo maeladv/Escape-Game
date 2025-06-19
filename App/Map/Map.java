@@ -156,18 +156,32 @@ public class Map extends JPanel {
      */
     public void setDisplayedMap(int displayedMap) {
         this.displayedMap = displayedMap;
-        // Charger la nouvelle image de la map
+        // Vérification de l'index pour éviter ArrayIndexOutOfBoundsException
+        if (displayedMap < 0 || displayedMap >= mapPath.length) {
+            GameUtils.printDev("Index de map invalide : " + displayedMap, devMode);
+            return;
+        }
         try {
-            mapImage = ImageIO.read(new File(mapPath[displayedMap]));
-            
+            File mapFile = new File(mapPath[displayedMap]);
+            if (mapFile.exists()) {
+                mapImage = ImageIO.read(mapFile);
+            } else {
+                mapImage = null;
+                GameUtils.printDev("Fichier de map introuvable : " + mapPath[displayedMap], devMode);
+            }
             // Mettre à jour l'image de la couche supérieure
             if (layers != null && layers.size() >= 3) {
                 final Layer topLayer = layers.get(2);
                 final BufferedImage[] finalMap2Images = new BufferedImage[secondLayerPath.length];
-                try {
-                    BufferedImage map2Image = ImageIO.read(new File(secondLayerPath[displayedMap]));
+                if (displayedMap < secondLayerPath.length) {
+                    File layerFile = new File(secondLayerPath[displayedMap]);
+                    BufferedImage map2Image = null;
+                    if (layerFile.exists()) {
+                        map2Image = ImageIO.read(layerFile);
+                    } else {
+                        GameUtils.printDev("Fichier de layer introuvable : " + secondLayerPath[displayedMap], devMode);
+                    }
                     finalMap2Images[displayedMap] = map2Image;
-                    
                     // Remplacer l'élément dans la couche supérieure
                     topLayer.clear();
                     topLayer.addElement(new Drawable() {
@@ -179,9 +193,6 @@ public class Map extends JPanel {
                             }
                         }
                     });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    GameUtils.printDev("Erreur lors du chargement de l'image de la deuxième couche : " + e.getMessage(), devMode);
                 }
             }
         } catch (IOException e) {

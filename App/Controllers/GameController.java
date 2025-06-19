@@ -486,11 +486,20 @@ public class GameController {
                     map.setDisplayedMap(2);
                     currentMapIndex = 2; // Mettre à jour l'index de la carte actuelle
                     map.setMurs(new ArrayList<>()); // Mettre à jour les murs avec un tableau vide
-
-                    joueur.setPosition(300, 530); // Positionner le joueur à un endroit spécifique
+                    // joueur.setCanMove(true); // Réactiver le mouvement du joueur
+                    teleportPlayer(400, 440, 3);
+                    joueur.setState(0);
+                    // joueur.setCanMove(false);
                     GameUtils.printDev("Changement de map vers la map 3 après le mini-jeu Couleurs.", devMode);                    
 
-
+                    // Annonce de la fin du jeu
+                    String[] messages_fin = {
+                        "Félicitations ! Vous avez réussi à sauver le village !",
+                        "Le cours de l'histoire a été modifié grâce à votre courage et votre ingéniosité.",
+                        "La vie dans le village reprend son cours normal, et les habitants vous remercient.",
+                        "Vous avez prouvé que même dans les moments les plus sombres, l'espoir et la détermination peuvent triompher.",
+                        "Merci d'avoir joué à Escape From The Biblioteca !",
+                    };
 
 
                     // Démarrer l'animation de fade out avant de changer de map
@@ -503,18 +512,6 @@ public class GameController {
 
             });
             
-            // donne la potion de téléportation au joueur
-            for (Item item : allItems) {
-                if (item.getName().equals("Potion de téléportation")) {
-                    if (!inventaire.contientItem(item.getName())) {
-                        inventaire.ajouterItem(item);
-                        GameUtils.printDev("Potion de téléportation ajoutée à l'inventaire après le mini-jeu de couleurs.",
-                                devMode);
-                        updateInventaireUI();
-                    }
-                    break;
-                }
-            }
         })); // Ajoute le mini-jeu Couleurs
         if (jeux.size() < 3) {
             GameUtils.printDev("Attention: la liste des mini-jeux ne contient pas 3 éléments! Taille actuelle: " + jeux.size(), devMode);
@@ -619,6 +616,17 @@ public class GameController {
             joueur.setCanMove(true);
         });
     }
+
+    // avec le réglage de la taille  du  joueur
+        public void teleportPlayer(int x, int y, int state, int[] playerSize) {
+            joueur.setPlayerHeight(playerSize[0]);
+            joueur.setPlayerWidth(playerSize[1]);
+            this.playerSize = playerSize[0]; // Mettre à jour la taille du joueur
+            teleportPlayer(x, y, state);
+        }
+
+    
+
 
     /**
      * Check if there is a collision at the given position

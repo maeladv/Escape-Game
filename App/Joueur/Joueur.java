@@ -9,6 +9,8 @@ import App.Utils.GameUtils;
 
 public class Joueur {
     private int x, y; // Position du joueur
+    private int playerWidth = 40; // Largeur du joueur
+    private int playerHeight = 40; // Hauteur du joueur
     private int state; // 0 : gauche, 1 : droite, 2 : haut, 3 : bas
     private int speed;
     private boolean canMove = true; // Indique si le joueur peut se déplacer
@@ -45,10 +47,10 @@ public class Joueur {
     public void afficher(Graphics g) {
         BufferedImage img = joueurImages[state];
         if (img != null) {
-            g.drawImage(img, x, y, 40, 40, null);
+            g.drawImage(img, x, y, this.playerWidth, this.playerHeight, null);
         } else {
             g.setColor(Color.RED);
-            g.fillOval(x, y, 40, 40);
+            g.fillOval(x, y, this.playerWidth, this.playerHeight);
         }    }
 
     public void deplacerGauche() { 
@@ -96,6 +98,31 @@ public class Joueur {
     public boolean isCanMove() { return canMove; }
     public void setCanMove(boolean canMove) { this.canMove = canMove; }
     public boolean canMove() { return canMove; } // Alias pour la compatibilité
+    public int getPlayerWidth() { return playerWidth; }
+    public void setPlayerWidth(int playerWidth) {
+        this.playerWidth = playerWidth;
+        // Forcer le repaint du composant parent si possible
+        if (devMode) System.out.println("Repaint demandé après setPlayerWidth");
+        EventQueue.invokeLater(() -> {
+            Container parent = null;
+            try {
+                parent = (Container) this.getClass().getDeclaredField("parent").get(this);
+            } catch (Exception ignored) {}
+            if (parent != null) parent.repaint();
+        });
+    }
+    public int getPlayerHeight() { return playerHeight; }
+    public void setPlayerHeight(int playerHeight) {
+        this.playerHeight = playerHeight;
+        if (devMode) System.out.println("Repaint demandé après setPlayerHeight");
+        EventQueue.invokeLater(() -> {
+            Container parent = null;
+            try {
+                parent = (Container) this.getClass().getDeclaredField("parent").get(this);
+            } catch (Exception ignored) {}
+            if (parent != null) parent.repaint();
+        });
+    }
     public BufferedImage[] getJoueurImages() { return joueurImages; }    public String[] getImagePaths() { return image_paths; }
     
     public boolean isDevMode() { return devMode; }
