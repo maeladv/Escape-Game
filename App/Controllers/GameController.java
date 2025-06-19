@@ -483,8 +483,8 @@ public class GameController {
             };
             dialogueManager.afficherScript(script, "Suivant", () -> {
                 // changer de map (3)
-                    map.setDisplayedMap(3);
-                    currentMapIndex = 3; // Mettre à jour l'index de la carte actuelle
+                    map.setDisplayedMap(2);
+                    currentMapIndex = 2; // Mettre à jour l'index de la carte actuelle
                     map.setMurs(new ArrayList<>()); // Mettre à jour les murs avec un tableau vide
 
                     joueur.setPosition(300, 530); // Positionner le joueur à un endroit spécifique

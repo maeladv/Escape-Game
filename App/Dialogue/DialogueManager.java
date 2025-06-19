@@ -31,9 +31,7 @@ public class DialogueManager {
             if (onClose != null) {
                 onClose.run();
             }
-            if (onCloseGlobal != null) {
-                onCloseGlobal.run();
-            }
+            // Ne pas appeler onCloseGlobal ici !
         });
         parent.add(currentDialogue);
         parent.setComponentZOrder(currentDialogue, 0); // Met le dialogue au premier plan
@@ -51,7 +49,6 @@ public class DialogueManager {
     public void afficherScript(String[] messages, String boutonTexte, Runnable onAllClose) {
         if (messages == null || messages.length == 0) return;
         final int[] index = {0};
-        this.onCloseGlobal = onAllClose;
         Runnable nextDialogue = new Runnable() {
             @Override
             public void run() {
@@ -60,10 +57,8 @@ public class DialogueManager {
                     afficherDialogue(messages[index[0]], boutonTexte, this);
                 } else {
                     // Dernier message, on exécute le callback une seule fois
-                    if (onCloseGlobal != null) {
-                        Runnable cb = onCloseGlobal;
-                        onCloseGlobal = null;
-                        cb.run();
+                    if (onAllClose != null) {
+                        onAllClose.run();
                     }
                 }
             }
