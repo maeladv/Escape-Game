@@ -22,8 +22,8 @@ public class Map extends JPanel {
     private int width;
     private int height;
     private int displayedMap = 0; // Indice de la map affichée
-    private String[] mapPath = {"assets/maps/intro/map.png","assets/maps/library/map.png"};
-    private String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png"};
+    private String[] mapPath = {"assets/maps/intro/map.png","assets/maps/library/map.png","assets/maps/end/map.png"};
+    private String[] secondLayerPath = {"assets/maps/intro/layer.png","assets/maps/library/layer.png","assets/maps/end/layer.png"};
     private BufferedImage mapImage; // permet de stocker l'image de la map
     private ArrayList<Rectangle> murs = new ArrayList<>();
     private boolean devMode; // Option de développement, à désactiver en prod
@@ -37,10 +37,18 @@ public class Map extends JPanel {
         this.height = 600;
         
         // Chargement de l'image de la map
+        mapImage = null;
         try {
-            mapImage = ImageIO.read(new File(mapPath[displayedMap]));
+            String mapPathStr = mapPath[displayedMap];
+            if (mapPathStr != null && !mapPathStr.isEmpty()) {
+                File mapFile = new File(mapPathStr);
+                if (mapFile.exists()) {
+                    mapImage = ImageIO.read(mapFile);
+                } else {
+                    GameUtils.printDev("Fichier de map introuvable : " + mapPathStr, devMode);
+                }
+            }
         } catch (IOException e) {
-            e.printStackTrace();
             GameUtils.printDev("Erreur lors du chargement de l'image de la map : " + e.getMessage(), devMode);
         }
         
@@ -67,11 +75,20 @@ public class Map extends JPanel {
         
         // Load second layer image
         BufferedImage map2Image = null;
-        try {
-            map2Image = ImageIO.read(new File(secondLayerPath[displayedMap]));
-        } catch (IOException e) {
-            e.printStackTrace();
-            GameUtils.printDev("Erreur lors du chargement de l'image de la deuxième couche : " + e.getMessage(), devMode);
+        String layerPath = secondLayerPath[displayedMap];
+        if (layerPath != null && !layerPath.isEmpty()) {
+            File layerFile = new File(layerPath);
+            if (layerFile.exists()) {
+                try {
+                    map2Image = ImageIO.read(layerFile);
+                } catch (IOException e) {
+                    GameUtils.printDev("Erreur lors du chargement de l'image de la deuxième couche : " + e.getMessage(), devMode);
+                }
+            } else {
+                GameUtils.printDev("Fichier de layer introuvable : " + layerPath, devMode);
+            }
+        } else {
+            GameUtils.printDev("Aucun chemin d'image pour la deuxième couche (index: " + displayedMap + ")", devMode);
         }
         
         // Store layer images for each map
@@ -139,18 +156,32 @@ public class Map extends JPanel {
      */
     public void setDisplayedMap(int displayedMap) {
         this.displayedMap = displayedMap;
-        // Charger la nouvelle image de la map
+        // Vérification de l'index pour éviter ArrayIndexOutOfBoundsException
+        if (displayedMap < 0 || displayedMap >= mapPath.length) {
+            GameUtils.printDev("Index de map invalide : " + displayedMap, devMode);
+            return;
+        }
         try {
-            mapImage = ImageIO.read(new File(mapPath[displayedMap]));
-            
+            File mapFile = new File(mapPath[displayedMap]);
+            if (mapFile.exists()) {
+                mapImage = ImageIO.read(mapFile);
+            } else {
+                mapImage = null;
+                GameUtils.printDev("Fichier de map introuvable : " + mapPath[displayedMap], devMode);
+            }
             // Mettre à jour l'image de la couche supérieure
             if (layers != null && layers.size() >= 3) {
                 final Layer topLayer = layers.get(2);
                 final BufferedImage[] finalMap2Images = new BufferedImage[secondLayerPath.length];
-                try {
-                    BufferedImage map2Image = ImageIO.read(new File(secondLayerPath[displayedMap]));
+                if (displayedMap < secondLayerPath.length) {
+                    File layerFile = new File(secondLayerPath[displayedMap]);
+                    BufferedImage map2Image = null;
+                    if (layerFile.exists()) {
+                        map2Image = ImageIO.read(layerFile);
+                    } else {
+                        GameUtils.printDev("Fichier de layer introuvable : " + secondLayerPath[displayedMap], devMode);
+                    }
                     finalMap2Images[displayedMap] = map2Image;
-                    
                     // Remplacer l'élément dans la couche supérieure
                     topLayer.clear();
                     topLayer.addElement(new Drawable() {
@@ -162,9 +193,6 @@ public class Map extends JPanel {
                             }
                         }
                     });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    GameUtils.printDev("Erreur lors du chargement de l'image de la deuxième couche : " + e.getMessage(), devMode);
                 }
             }
         } catch (IOException e) {

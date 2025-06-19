@@ -26,7 +26,7 @@ public class Main {
     
     // Configuration globale du jeu (centralisée)
     private static boolean devMode = true;
-    private static int playerSize = 40;
+    private static int playerSize = 40; // Taille du joueur par défaut en carré
     private static int interactionZoneSize = 5; // Marge autour du joueur pour les interactions
 
     private static void initialiserFenetre() {
@@ -45,6 +45,8 @@ public class Main {
         
         // Créer le joueur
         joueur = new Joueur(30, 460, 10, devMode);
+
+        playerSize = joueur.getPlayerWidth(); // Mettre à jour la taille du joueur depuis l'objet Joueur par défaut
         
         // Ajouter le joueur au layer du milieu de la map
         map.addPlayerLayerElement(new Drawable() {
