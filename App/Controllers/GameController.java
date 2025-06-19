@@ -143,23 +143,6 @@ public class GameController {
                             messages, "OK");
                 }));
 
-        // ajout d'un objet interactif pour un mini jeu Game
-        objetsIntro.add(new Objet("objet interactif",
-                new Rectangle(100, 450, 50, 50), inventaire,
-                () -> {
-                    if (!jeux.isEmpty()) {
-                        Game miniJeu = jeux.get(0); // Prendre le premier mini-jeu
-                        GameUtils.printDev("Lancement du mini-jeu: " + miniJeu.getName(), devMode);
-                        miniJeu.afficherMiniJeu(map); // Affiche le mini-jeu dans la même fenêtre
-                    } else {
-                        dialogueManager.afficherDialogue(
-                                "Aucun mini-jeu disponible pour le moment.",
-                                "OK");
-                    }
-                }));
-
-        // Objet qui lance le mini-jeu Couleurs
-
         objetsParMap.add(objetsIntro);
 
         // Ajouter un élément drawable pour afficher les informations de debug
@@ -415,7 +398,7 @@ public class GameController {
         // échelle item
         Item echelle = new Item("Échelle",
                 "Une échelle en bois, elle semble solide.",
-                new java.io.File("assets/items/echelle.png"), tableBibliotheque1,
+                new java.io.File("assets/items/echelle.png"), null,
                 () -> {
                     // Action à exécuter lorsque l'item est cliqué
                 });
@@ -489,7 +472,50 @@ public class GameController {
                 }
             }
         })); // Ajoute le parchemin comme mini-jeu
-        jeux.add(new CouleursGame(devMode, dialogueManager));
+        jeux.add(new CouleursGame(devMode, dialogueManager, () -> {
+            String[] script = {
+                    "OH! J'entends un grondement lourd au loins. Il semble venir du village!",
+                    "Le soleil se lève et j'entends la cloche d'une église.",
+                    "Il y a comme une agitation au loin, comme si le village s'était réveillé.",
+                    "OH! Je me sens emporté comme si j'avais bu une nouvelle potion, que se passe-t-il ?",
+                    "Aurais-je réussi ce mélange correctement ?",
+                    "Cela signifierait-il que le village s'est réveillé ?",
+            };
+            dialogueManager.afficherScript(script, "Suivant", () -> {
+                // changer de map (3)
+                    map.setDisplayedMap(3);
+                    currentMapIndex = 3; // Mettre à jour l'index de la carte actuelle
+                    map.setMurs(new ArrayList<>()); // Mettre à jour les murs avec un tableau vide
+
+                    joueur.setPosition(300, 530); // Positionner le joueur à un endroit spécifique
+                    GameUtils.printDev("Changement de map vers la map 3 après le mini-jeu Couleurs.", devMode);                    
+
+
+
+
+                    // Démarrer l'animation de fade out avant de changer de map
+                    // animation.startFadeOut(500, (Void v) -> {
+                    //     changeMap(3);
+                    //     GameUtils.printDev("Interaction avec la porte de la map 0 ! Changement de map.", devMode);
+                    // });
+                    // joueur.setPosition(300, 530);
+                    // joueur.setState(1);
+
+            });
+            
+            // donne la potion de téléportation au joueur
+            for (Item item : allItems) {
+                if (item.getName().equals("Potion de téléportation")) {
+                    if (!inventaire.contientItem(item.getName())) {
+                        inventaire.ajouterItem(item);
+                        GameUtils.printDev("Potion de téléportation ajoutée à l'inventaire après le mini-jeu de couleurs.",
+                                devMode);
+                        updateInventaireUI();
+                    }
+                    break;
+                }
+            }
+        })); // Ajoute le mini-jeu Couleurs
         if (jeux.size() < 3) {
             GameUtils.printDev("Attention: la liste des mini-jeux ne contient pas 3 éléments! Taille actuelle: " + jeux.size(), devMode);
         }
@@ -528,7 +554,9 @@ public class GameController {
     public void changeMap(int mapIndex) {
         // Si une animation est déjà en cours, ne rien faire
         if (animation.isRunning()) {
+            GameUtils.printDev("Changement de carte annulé, animation en cours.", devMode);
             return;
+
         }
 
         // Démarrer l'animation de fade out

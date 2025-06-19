@@ -55,6 +55,10 @@ public class CouleursGame extends Game implements MouseListener {
             Arrays.fill(row, 0);
         this.gameFont = GameUtils.loadFont("assets/yoster.ttf", 24f);
     }
+    public CouleursGame(boolean devMode, DialogueManager dialogueManager, Runnable onCloseCallback) {
+        this(devMode, dialogueManager);
+        this.onCloseCallback = onCloseCallback;
+    }
 
     @Override
     public JPanel getMainPanel() {
@@ -81,6 +85,8 @@ public class CouleursGame extends Game implements MouseListener {
         verifyButton = new JButton("Vérifier");
         verifyButton.setBounds(100, 350, 120, 40);
         verifyButton.addActionListener(e -> verifyPattern());
+        // image de fond et police du jeu
+
         mainPanel.add(verifyButton);
 
         messageLabel = new JLabel("");

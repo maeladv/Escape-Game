@@ -58,6 +58,13 @@ public class DialogueManager {
                 if (index[0] < messages.length - 1) {
                     index[0]++;
                     afficherDialogue(messages[index[0]], boutonTexte, this);
+                } else {
+                    // Dernier message, on exécute le callback une seule fois
+                    if (onCloseGlobal != null) {
+                        Runnable cb = onCloseGlobal;
+                        onCloseGlobal = null;
+                        cb.run();
+                    }
                 }
             }
         };
