@@ -20,7 +20,7 @@ Le jeu se se plongera dans un univers mysterieux et ensorcelé. Il était une fo
    - Le script de l'histoire apparait dans un context box
    - Le joueur rentre
 2. la map de la bibliothèque apparait
- - On obtient plus de contexte sur l'histoire et les objectisf du jeu
+ - On obtient plus de contexte sur l'histoire et les objectifs du jeu
   
 3. certains objets peuvent s'activer au clic sur A -> Une image / mini jeu s'affiche par dessus la map
 
